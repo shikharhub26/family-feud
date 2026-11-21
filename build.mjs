@@ -6,7 +6,7 @@ const read = f => readFileSync(new URL(`./src/${f}`, import.meta.url), 'utf8');
 const css = read('styles.css'), questions = read('questions.js'), game = read('game.js'), ai = read('ai.js');
 
 // sanity-check the question bank
-const QUESTIONS = vm.runInNewContext(`${questions}; QUESTIONS`);
+const { QUESTIONS, SCHEDULE } = vm.runInNewContext(`${questions}; ({ QUESTIONS, SCHEDULE })`);
 const ids = new Set();
 for (const q of QUESTIONS) {
   if (ids.has(q.id)) throw new Error(`duplicate id ${q.id}`);
@@ -55,9 +55,13 @@ writeFileSync(new URL('./dist/standalone/finance-feud-ai.html', import.meta.url)
 
 // answer key for the host guide
 const CATS = { canada: 'True North', office: 'Office life', finance: 'Canada Life and Finance', wild: 'Wild cards' };
-const block = (q, i) => `**${i + 1}. ${q.q}** _(${CATS[q.cat]})_\n\n${q.a.map((a, n) => `${n + 1}. ${a[0]} — ${a[1]}`).join('\n')}\n`;
-const section = (title, from, to) => `### ${title}\n\n${QUESTIONS.slice(from, to).map((q, i) => block(q, from + i)).join('\n')}`;
-const key = `${section('Semi-final 1', 0, 3)}\n${section('Semi-final 2', 3, 6)}\n${section('The Final', 6, 9)}\n${section('Spare questions', 9, QUESTIONS.length)}`;
+const byId = Object.fromEntries(QUESTIONS.map(q => [q.id, q]));
+const ORDER = [...SCHEDULE.q, ...SCHEDULE.f];
+for (const id of ORDER) if (!byId[id]) throw new Error(`schedule names unknown question ${id}`);
+for (const q of QUESTIONS) if (!ORDER.includes(q.id)) ORDER.push(q.id);
+const block = id => { const q = byId[id]; return `**${ORDER.indexOf(id) + 1}. ${q.q}** _(${CATS[q.cat]})_\n\n${q.a.map((a, n) => `${n + 1}. ${a[0]} — ${a[1]}`).join('\n')}\n`; };
+const section = (title, ids) => `### ${title}\n\n${ids.map(block).join('\n')}`;
+const key = `${section('Qualifier', SCHEDULE.q)}\n${section('The Final', SCHEDULE.f)}\n${section('Spare questions', ORDER.slice(SCHEDULE.q.length + SCHEDULE.f.length))}`;
 const guide = readFileSync(new URL('./HOST-GUIDE.template.md', import.meta.url), 'utf8').replace('{{ANSWER_KEY}}', key);
 writeFileSync(new URL('./HOST-GUIDE.md', import.meta.url), guide);
 console.log(`Built ${QUESTIONS.length} questions into dist/`);

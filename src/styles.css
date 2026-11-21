@@ -157,8 +157,10 @@ h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.05;
 .mrow span { min-width: 0; overflow-wrap: anywhere; flex: 1; }
 .mrow b { font-variant-numeric: tabular-nums; font-size: 1.5rem; }
 .mrow.is-out { opacity: .45; }
+.out { font-style: normal; font-family: var(--body); font-size: .7rem; font-weight: 800; border: 1.5px solid var(--line); color: var(--ink-2); padding: .1rem .5rem; border-radius: 999px; }
+.mcard-sub { font-size: .85rem; color: var(--ink-2); }
 .mrow.is-tbd { color: var(--ink-2); font-family: var(--body); font-weight: 600; font-size: 1rem; }
-.won { font-family: var(--body); font-size: .7rem; font-weight: 800; background: var(--gold); color: var(--gold-ink); padding: .15rem .5rem; border-radius: 999px; }
+.won { font-style: normal; font-family: var(--body); font-size: .7rem; font-weight: 800; background: var(--gold); color: var(--gold-ink); padding: .15rem .5rem; border-radius: 999px; }
 .mcard--final { padding: 1.3rem 1.3rem; }
 .mcard--final .mrow { font-size: 1.6rem; }
 
@@ -175,8 +177,15 @@ h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.05;
     radial-gradient(circle at 50% 52%, transparent 0 calc(30vmin - 3px), var(--ice) calc(30vmin - 2px) 30vmin, transparent calc(30vmin + 1px));
 }
 .stage > * { position: relative; z-index: 1; }
-.team { align-self: center; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: .5rem; padding: 1.6rem .6rem; border-radius: 1.5rem; border: 2px solid transparent; min-width: 0; }
+.team { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: .5rem; padding: 1.6rem .6rem; border-radius: 1.5rem; border: 2px solid transparent; min-width: 0; }
 .team.is-live { background: var(--paper); border-color: var(--tc); box-shadow: 0 20px 50px var(--shade); }
+.team.is-dim { opacity: .45; }
+.side { display: grid; gap: clamp(.6rem, 2vh, 1.2rem); align-content: center; min-width: 0; }
+.stage--four .team { padding: 1rem .6rem; gap: .35rem; }
+.stage--four .team-score { font-size: clamp(2.4rem, 4.4vw, 4.4rem); }
+.stage--four .team-name { font-size: 1.2rem; }
+.stage--four .strikes { min-height: 2.1rem; }
+.stage--four .strikes i { width: 2rem; height: 2rem; font-size: 1.15rem; }
 .team-flag { width: 2.6rem; height: .5rem; border-radius: 999px; background: var(--tc); }
 .team-name { font-family: var(--display); font-weight: 700; font-size: 1.4rem; line-height: 1.05; overflow-wrap: anywhere; text-wrap: balance; }
 .team-score { font-family: var(--display); font-weight: 800; font-size: clamp(3rem, 6.2vw, 6rem); line-height: .9; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }

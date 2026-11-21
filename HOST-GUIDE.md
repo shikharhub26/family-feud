@@ -1,27 +1,34 @@
 # Finance Feud: host guide
 
-A survey-style team game for the Canada Life Finance event. Four teams, two semi-finals, one final. About 45 minutes with three rounds a match.
+A survey-style team game for the Canada Life Finance event. All four teams play a qualifier together, the bottom two are eliminated, and the top two play a head-to-head final. About 40 minutes with four qualifier rounds and three final rounds.
 
 ## Before the room arrives
 
 1. Open the game on the laptop that feeds the big screen and press **Full screen**.
-2. Type the four team names. **Shuffle the draw** if you want random semi-finals.
+2. Type the four team names. **Shuffle the order** if you want a random playing order.
 3. Turn the laptop volume up. The game makes its own ding, buzzer and fanfare.
 4. Print this guide, or open the answer key on your phone (**Menu > Answer key**). Never open it on the big screen.
 5. AI edition only: press **Switch on the AI judge** and choose Allow when Claude asks.
 
-Bring something to buzz with: two desk bells, or just "first hand on the table".
+For the final, bring something to buzz with: two desk bells, or just "first hand on the table".
 
-## The rules, in one breath
+## Stage 1: the qualifier (all four teams)
+
+- Everyone plays the same board. Teams take turns in the order shown on screen, and a different team answers first each round.
+- Each turn, **one player gives one answer**. No help from teammates. Rotate players so everyone gets a go.
+- **On the board:** the team banks that answer's points straight away.
+- **Not on the board:** a strike. **Two strikes and that team sits out the rest of the round.**
+- The round ends when the board is clear or every team has two strikes. You can also press **End round** if time is tight.
+- The last qualifying round is worth **double**.
+- After the last round the **top two teams go through** and the **bottom two are out**. If there is a tie at the cut, the tied teams play one extra round to split them.
+
+## Stage 2: the final (top two teams)
 
 - **Face-off.** One player from each team comes up. Read the question. First to buzz answers. The higher answer on the board wins control.
 - **Play or pass.** The face-off winners choose to play the round or pass it across.
-- **Down the line.** The playing team answers one person at a time, no help. Each answer on the board adds its points to the round total.
-- **Three strikes.** After three wrong answers the other team huddles and gives one answer. If it is on the board they steal the whole round total. If not, the playing team keeps it.
-- **Points.** The last round of a semi-final is worth double. The final goes single, double, triple.
-- **Tie.** The game deals one extra round automatically.
-
-With about ten people a team, rotate who comes up for the face-off each round and keep going down the line where the last round stopped, so everyone answers at least once.
+- **Down the line.** The playing team answers one person at a time. Each answer on the board adds its points to the round total.
+- **Three strikes.** The other team huddles and gives one answer. If it is on the board they steal the whole round total. If not, the playing team keeps it.
+- **Points.** Rounds are worth single, double, then triple. A tie gets one extra round.
 
 ## Running a round
 
@@ -29,13 +36,12 @@ The dark bar at the bottom of the screen always tells you the next step.
 
 | You see | You do |
 | --- | --- |
-| Round number | Call two players up, press **Show the question** |
-| "Who buzzed first?" | Click that team (or press the left or right arrow key) |
-| Answer box | Type what the player said, press Enter |
-| "Play or pass?" | Click the team's choice |
-| Answer box, team playing | Type each answer, press Enter. Press **Strike** if they run out of time |
-| "Chance to steal" | Type the other team's one answer |
+| Round number | Press **Show the question** and read it aloud |
+| "(Team): one player, one answer" | Type what the player said, press Enter. Press **Strike** if they run out of time |
 | Round result | Press **Reveal the next answer** until the board is clear, then **Next round** |
+| Final only: "Who buzzed first?" | Click that team (or press the left or right arrow key) |
+| Final only: "Play or pass?" | Click the team's choice |
+| Final only: "Chance to steal" | Type the other team's one answer |
 
 If the game gets one wrong:
 
@@ -51,7 +57,7 @@ A refresh will not lose the game. It is saved in the browser after every step.
 
 The number beside each question matches the "Question" tag on the game screen. The answers and points were written for this event; they are not from a real survey.
 
-### Semi-final 1
+### Qualifier
 
 **1. Name something Canadians say sorry for.** _(True North)_
 
@@ -71,18 +77,7 @@ The number beside each question matches the "Question" tag on the game screen. T
 5. Lie down — 11
 6. Leave the room — 9
 
-**3. Name a benefit people rush to use up before their plan year resets.** _(Canada Life and Finance)_
-
-1. Massage — 34
-2. Dental — 24
-3. Glasses and eye exams — 18
-4. Physio — 11
-5. Chiropractor — 7
-6. Therapy and counselling — 6
-
-### Semi-final 2
-
-**4. Name a Canadian food every visitor has to try.** _(True North)_
+**3. Name a Canadian food every visitor has to try.** _(True North)_
 
 1. Poutine — 38
 2. Maple syrup — 22
@@ -92,27 +87,18 @@ The number beside each question matches the "Question" tag on the game screen. T
 6. Montreal bagels or smoked meat — 6
 7. Ketchup chips — 5
 
-**5. Name something that mysteriously disappears from the office fridge.** _(Office life)_
+**4. Name a benefit people rush to use up before their plan year resets.** _(Canada Life and Finance)_
 
-1. Your lunch — 38
-2. Milk or cream — 22
-3. Yogurt — 13
-4. Leftover cake or pizza — 11
-5. Pop and drinks — 9
-6. Salad dressing — 7
-
-**6. Name something that makes Finance people panic at month-end.** _(Canada Life and Finance)_
-
-1. Numbers that don't balance — 30
-2. Late entries — 22
-3. Excel crashing — 18
-4. The system going down — 13
-5. A question from the auditors — 9
-6. A last-minute change — 8
+1. Massage — 34
+2. Dental — 24
+3. Glasses and eye exams — 18
+4. Physio — 11
+5. Chiropractor — 7
+6. Therapy and counselling — 6
 
 ### The Final
 
-**7. Name a word that instantly gives you away as Canadian.** _(True North)_
+**5. Name a word that instantly gives you away as Canadian.** _(True North)_
 
 1. "Eh" — 40
 2. "Sorry" — 25
@@ -122,7 +108,7 @@ The number beside each question matches the "Question" tag on the game screen. T
 6. "Washroom" — 5
 7. "About" — 3
 
-**8. Name something adults pretend to understand.** _(Wild cards)_
+**6. Name something adults pretend to understand.** _(Wild cards)_
 
 1. Taxes — 27
 2. Crypto — 21
@@ -131,7 +117,7 @@ The number beside each question matches the "Question" tag on the game screen. T
 5. Mortgage rates — 12
 6. Their own insurance policy — 11
 
-**9. Name something a CFO never wants to hear.** _(Canada Life and Finance)_
+**7. Name something a CFO never wants to hear.** _(Canada Life and Finance)_
 
 1. "We're over budget" — 34
 2. "The auditors found something" — 22
@@ -141,6 +127,24 @@ The number beside each question matches the "Question" tag on the game screen. T
 6. "I didn't back it up" — 6
 
 ### Spare questions
+
+**8. Name something that mysteriously disappears from the office fridge.** _(Office life)_
+
+1. Your lunch — 38
+2. Milk or cream — 22
+3. Yogurt — 13
+4. Leftover cake or pizza — 11
+5. Pop and drinks — 9
+6. Salad dressing — 7
+
+**9. Name something that makes Finance people panic at month-end.** _(Canada Life and Finance)_
+
+1. Numbers that don't balance — 30
+2. Late entries — 22
+3. Excel crashing — 18
+4. The system going down — 13
+5. A question from the auditors — 9
+6. A last-minute change — 8
 
 **10. Name something you should never do at the office holiday party.** _(Wild cards)_
 

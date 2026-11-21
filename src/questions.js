@@ -1,9 +1,10 @@
 /* Question bank.
    Each answer is [text shown on the board, points, accepted wordings separated by |].
-   Order matters: the first nine are the default running order
-   (semi-final 1, semi-final 2, final). Everything after is a spare. */
+   SCHEDULE is the default running order: the qualifier all four teams play,
+   then the head-to-head final. Every other question is a spare. */
+const SCHEDULE = { q: ['c1', 'o1', 'c2', 'f1'], f: ['c9', 'w2', 'f9'] };
 const QUESTIONS = [
-  /* ---- Semi-final 1 ---- */
+  /* ---- Scheduled questions (see SCHEDULE) and spares ---- */
   { id: 'c1', cat: 'canada', q: 'Name something Canadians say sorry for.', a: [
     ['Bumping into someone', 36, 'bump|bumping into|bumped|walking into|running into|in the way|getting in the way|brushing past|collision'],
     ['Being late', 20, 'late|lateness|running late|tardy'],
@@ -29,7 +30,6 @@ const QUESTIONS = [
     ['Therapy and counselling', 6, 'therapy|therapist|counselling|counseling|psychologist|mental health|psychotherapy|counsellor'],
   ]},
 
-  /* ---- Semi-final 2 ---- */
   { id: 'c2', cat: 'canada', q: 'Name a Canadian food every visitor has to try.', a: [
     ['Poutine', 38, 'poutine|fries and gravy|cheese curds'],
     ['Maple syrup', 22, 'maple|syrup|maple syrup|maple taffy'],
@@ -56,7 +56,6 @@ const QUESTIONS = [
     ['A last-minute change', 8, 'last minute|change|changes|adjustment|one more thing|boss|cfo|restatement'],
   ]},
 
-  /* ---- Final ---- */
   { id: 'c9', cat: 'canada', q: 'Name a word that instantly gives you away as Canadian.', a: [
     ['"Eh"', 40, 'eh|ay|aye'],
     ['"Sorry"', 25, 'sorry|sore-y|soary'],
@@ -83,7 +82,6 @@ const QUESTIONS = [
     ['"I didn\'t back it up"', 6, 'backup|back up|deleted|lost the file|no backup|didnt save'],
   ]},
 
-  /* ---- Spares, in suggested order ---- */
   { id: 'w1', cat: 'wild', q: 'Name something you should never do at the office holiday party.', a: [
     ['Have too much to drink', 36, 'drink|drunk|drinking|alcohol|booze|shots|wasted|too much wine'],
     ['Tell the boss what you really think', 18, 'boss|honest|truth|complain|criticize|rant|roast|cfo|manager'],

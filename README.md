@@ -1,6 +1,6 @@
 # Finance Feud
 
-A survey-style team game for the Canada Life Finance event: four teams, two semi-finals, one final.
+A survey-style team game for the Canada Life Finance event: all four teams play a qualifier, the bottom two are out, and the top two play the final.
 
 - `dist/artifact/finance-feud.html` — classic edition (keyword matching), published as a Claude artifact
 - `dist/artifact/finance-feud-ai.html` — AI edition (Claude Sonnet judges answers and writes host quips), published as a Claude artifact
