@@ -901,7 +901,7 @@ const Feud = (() => {
         const fo = r.fo;
         if (fo.n === 0) { fo.n = 1; fo.turn = other(fo.turn); fo.fresh = false; }
         else if (fo.hit) { fo.winner = fo.hit.team; r.phase = 'choose'; }
-        else { fo.n = 0; fo.turn = fo.first; fo.fresh = true; }
+        else { fo.n = 0; fo.turn = null; fo.first = null; fo.hit = null; fo.fresh = true; }
       } else if (r.phase === 'play') {
         r.strikes += 1; count = r.strikes;
         if (r.strikes >= 3) r.phase = 'steal';
@@ -1221,11 +1221,10 @@ const Feud = (() => {
       cue = `${esc(names[act])}: one player, one answer.${r.out[act] === 1 ? ' One strike already.' : ''}`;
       acts = answerForm('Type the answer you heard', 'Strike') + '<button class="btn btn--undo" data-act="endround">End round</button>';
     } else if (r.phase === 'faceoff' && r.fo.turn == null) {
-      cue = 'Read the question aloud. Who buzzed first?';
+      cue = r.fo.fresh ? 'Neither answer is on the board. Call up the next two players and read the question again. Who buzzed first?' : 'Read the question aloud. Who buzzed first?';
       acts = `${tbtn(0)}<span class="kbd">←</span><span class="kbd">→</span>${tbtn(1)}`;
     } else if (r.phase === 'faceoff') {
       cue = r.fo.hit ? `${esc(names[act])}: beat “${esc(q.a[r.fo.hit.idx][0])}” to take control.`
-        : r.fo.fresh ? `Neither answer is up there. Next two players: ${esc(names[act])} first.`
         : `${esc(names[act])} to answer.`;
       acts = answerForm('Type the answer you heard', 'No answer');
     } else if (r.phase === 'choose') {

@@ -24,7 +24,7 @@ For the final, bring something to buzz with: two desk bells, or just "first hand
 
 ## Stage 2: the final (top two teams)
 
-- **Face-off.** One player from each team comes up. Read the question. First to buzz answers. The higher answer on the board wins control.
+- **Face-off.** One player from each team comes up. Read the question. First to buzz answers. The higher answer on the board wins control. If both players miss, the next two players come up and buzz again.
 - **Play or pass.** The face-off winners choose to play the round or pass it across.
 - **Down the line.** The playing team answers one person at a time. Each answer on the board adds its points to the round total.
 - **Three strikes.** The other team huddles and gives one answer. If it is on the board they steal the whole round total. If not, the playing team keeps it.
