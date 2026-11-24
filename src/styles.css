@@ -62,8 +62,9 @@ h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.05;
 
 #app {
   min-height: 100%; display: flex; flex-direction: column;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  --gutter: clamp(16px, 5vw, 96px);
+  padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
 }
 
 /* ---------- top bar ---------- */
@@ -235,7 +236,7 @@ h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.05;
 .banner { align-self: center; text-align: center; background: var(--gold); color: var(--gold-ink); border-radius: 1.2rem; padding: .6rem 1.4rem; font-family: var(--display); font-weight: 800; font-size: clamp(1.2rem, 2.2vw, 1.9rem); }
 
 /* ---------- host bar ---------- */
-.host { background: var(--host); color: var(--host-ink); border-radius: 1.3rem 1.3rem 0 0; padding: .8rem 1.1rem calc(.8rem + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; margin-inline: calc(-1 * min(16px, 1vw)); }
+.host { background: var(--host); color: var(--host-ink); border-radius: 1.3rem 1.3rem 0 0; padding: .8rem 1.1rem calc(.8rem + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; margin-inline: calc(-1 * var(--gutter) + min(16px, 1vw)); }
 .host-cue { flex: 1 1 16rem; min-width: 0; display: grid; gap: .1rem; }
 .host-cue small { font-size: .7rem; font-weight: 700; color: var(--host-2); }
 .host-cue strong { font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
