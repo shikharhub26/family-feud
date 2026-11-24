@@ -31,12 +31,12 @@ ${scripts.join('\n')}
 Feud.boot();
 </script>
 `;
-const standalone = body => `<!doctype html>
+const standalone = (body, extraHead = '') => `<!doctype html>
 <html lang="en-CA">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-</head>
+${extraHead}</head>
 <body>
 ${body}</body>
 </html>
@@ -52,6 +52,11 @@ writeFileSync(new URL('./dist/artifact/finance-feud.html', import.meta.url), cla
 writeFileSync(new URL('./dist/artifact/finance-feud-ai.html', import.meta.url), aiPage);
 writeFileSync(new URL('./dist/standalone/finance-feud.html', import.meta.url), standalone(classic));
 writeFileSync(new URL('./dist/standalone/finance-feud-ai.html', import.meta.url), standalone(aiPage));
+// GitHub Pages copy of the classic edition. The AI edition needs the Claude
+// artifact viewer to reach Claude, so it is not hosted here.
+mkdirSync(new URL('./docs/', import.meta.url), { recursive: true });
+writeFileSync(new URL('./docs/index.html', import.meta.url), standalone(classic, '<meta name="robots" content="noindex, nofollow">\n'));
+writeFileSync(new URL('./docs/.nojekyll', import.meta.url), '');
 
 // answer key for the host guide
 const CATS = { canada: 'True North', office: 'Office life', finance: 'Canada Life and Finance', wild: 'Wild cards' };

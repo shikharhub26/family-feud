@@ -1,0 +1,1440 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+<title>Finance Feud</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400..700&display=swap">
+<style>
+/* Layout: a one-screen stage. Teams flank a centre board that sits on a
+   faint centre-ice circle; a dark host bar runs along the bottom and always
+   says what to do next. Brand red does the heavy lifting; gold is for wins. */
+:root {
+  --red: #D02927;            /* Canada Life red. Change this one value to re-brand. */
+  --red-deep: #A31C1E;
+  --on-red: #FFFFFF;
+  --wash: #FBF3F1;           /* stage background */
+  --paper: #FFFFFF;          /* cards */
+  --ink: #241A1B;
+  --ink-2: #66575A;
+  --line: #EAD9D6;
+  --face: #FFFFFF;           /* revealed answer */
+  --face-ink: #241A1B;
+  --gold: #F4B740;
+  --gold-ink: #3A2A00;
+  --host: #241A1B;           /* host bar */
+  --host-ink: #FFF6F3;
+  --host-2: #C9B6B3;
+  --host-field: #3B2D2E;
+  --ice: rgba(208, 41, 39, .13);
+  --shade: rgba(110, 20, 22, .14);
+  --scrim: rgba(28, 12, 13, .72);
+  --t0: #B97A00;  --t1: #0B7F86;  --t2: #3F4FBF;  --t3: #8A3FA6;
+  --display: "Bricolage Grotesque", "Avenir Next Condensed", "Segoe UI", system-ui, sans-serif;
+  --body: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --red: #E13B37; --red-deep: #A31C1E; --on-red: #FFFFFF;
+    --wash: #170C0D; --paper: #25181A; --ink: #FFF4F1; --ink-2: #CDB8B5; --line: #48302F;
+    --face: #FFF6F3; --face-ink: #241A1B; --gold: #F7C255; --gold-ink: #3A2A00;
+    --host: #0C0606; --host-ink: #FFF4F1; --host-2: #BDA8A5; --host-field: #2B1A1B;
+    --ice: rgba(225, 59, 55, .2); --shade: rgba(0, 0, 0, .45); --scrim: rgba(8, 3, 3, .8);
+    --t0: #F0B429; --t1: #3CBEC5; --t2: #8E9BF5; --t3: #CB8BE6;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --red: #E13B37; --red-deep: #A31C1E; --on-red: #FFFFFF;
+  --wash: #170C0D; --paper: #25181A; --ink: #FFF4F1; --ink-2: #CDB8B5; --line: #48302F;
+  --face: #FFF6F3; --face-ink: #241A1B; --gold: #F7C255; --gold-ink: #3A2A00;
+  --host: #0C0606; --host-ink: #FFF4F1; --host-2: #BDA8A5; --host-field: #2B1A1B;
+  --ice: rgba(225, 59, 55, .2); --shade: rgba(0, 0, 0, .45); --scrim: rgba(8, 3, 3, .8);
+  --t0: #F0B429; --t1: #3CBEC5; --t2: #8E9BF5; --t3: #CB8BE6;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { height: 100%; font-size: clamp(15px, 0.6vw + 0.6vh + 4px, 24px); }
+body {
+  height: 100%; margin: 0; background: var(--wash); color: var(--ink);
+  font-family: var(--body); font-size: 1rem; line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+[hidden] { display: none !important; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.05; }
+
+#app {
+  min-height: 100%; display: flex; flex-direction: column;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ---------- top bar ---------- */
+.top { display: flex; align-items: center; gap: 1rem; padding-block: .7rem .5rem; flex-wrap: wrap; }
+.brand { display: flex; align-items: baseline; gap: .6rem; min-width: 0; margin-right: auto; }
+.brand-mark { font-family: var(--display); font-weight: 800; font-size: 1.25rem; color: var(--red); letter-spacing: -.01em; white-space: nowrap; }
+.brand-org { font-weight: 600; color: var(--ink-2); font-size: .85rem; overflow-wrap: anywhere; }
+.where { font-weight: 700; font-size: .9rem; color: var(--ink); }
+.tools { display: flex; align-items: center; gap: .35rem; position: relative; }
+.tool {
+  display: inline-flex; align-items: center; gap: .4rem; height: 2.2rem; padding: 0 .7rem;
+  background: transparent; border: 1.5px solid var(--line); border-radius: 999px;
+  font-weight: 600; font-size: .8rem; color: var(--ink);
+}
+.tool:hover { border-color: var(--red); color: var(--red); }
+.tool svg { width: 1.05rem; height: 1.05rem; flex: none; }
+.chip-x { display: inline-flex; align-items: center; gap: .4rem; height: 2.2rem; padding: 0 .75rem; border-radius: 999px; font-size: .8rem; font-weight: 700; background: var(--paper); border: 1.5px solid var(--line); }
+.chip-x i { width: .55rem; height: .55rem; border-radius: 50%; background: var(--ink-2); }
+.chip-x.is-on i { background: #1E9E63; }
+.menu {
+  position: absolute; right: 0; top: calc(100% + .4rem); z-index: 30; min-width: 15rem;
+  background: var(--paper); border: 1.5px solid var(--line); border-radius: 1rem; padding: .4rem;
+  box-shadow: 0 18px 40px var(--shade); display: grid; gap: .1rem;
+}
+.menu button { text-align: left; background: none; border: 0; padding: .6rem .8rem; border-radius: .65rem; font-weight: 600; font-size: .9rem; }
+.menu button:hover { background: var(--wash); color: var(--red); }
+.menu hr { border: 0; border-top: 1.5px solid var(--line); margin: .3rem 0; width: 100%; }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 2.9rem; padding: .55rem 1.3rem; border-radius: 999px; border: 2px solid transparent;
+  font-weight: 700; font-size: 1rem; white-space: nowrap; transition: transform .08s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn--go { background: var(--red); color: var(--on-red); }
+.btn--go:hover { background: var(--red-deep); }
+.btn--line { background: transparent; border-color: currentColor; }
+.btn--line:hover { color: var(--red); }
+.btn--quiet { background: transparent; border-color: var(--line); color: var(--ink); min-height: 2.5rem; font-size: .9rem; padding-inline: 1rem; }
+.btn--quiet:hover { border-color: var(--red); color: var(--red); }
+.btn--big { min-height: 3.6rem; font-size: 1.2rem; padding-inline: 2rem; }
+.btn[disabled] { opacity: .45; cursor: default; }
+.kbd { font-size: .7rem; font-weight: 700; padding: .1rem .4rem; border-radius: .35rem; border: 1.5px solid currentColor; opacity: .7; }
+
+/* ---------- setup ---------- */
+.setup { flex: 1; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 4rem); align-items: center; padding-block: 1rem 2rem; }
+.hero-org { font-weight: 700; color: var(--ink-2); font-size: 1.05rem; }
+.hero-title { font-size: clamp(3.4rem, 9.5vw, 8.5rem); font-weight: 800; letter-spacing: -.025em; line-height: .88; color: var(--red); margin-block: .5rem 1.2rem; }
+.hero-line { font-size: 1.35rem; font-weight: 600; max-width: 22em; }
+.hero-sub { color: var(--ink-2); margin-top: .7rem; max-width: 30em; }
+.hero-actions { display: flex; gap: .7rem; flex-wrap: wrap; margin-top: 1.6rem; }
+.panel { background: var(--paper); border: 1.5px solid var(--line); border-radius: 1.5rem; padding: clamp(1.1rem, 2.2vw, 1.8rem); box-shadow: 0 24px 60px var(--shade); display: grid; gap: 1.1rem; }
+.panel h2 { font-size: 1.35rem; font-weight: 700; }
+.field { display: grid; gap: .3rem; }
+.field > span, .field-label { font-size: .8rem; font-weight: 700; color: var(--ink-2); }
+.input {
+  width: 100%; min-width: 0; height: 2.8rem; padding: 0 .9rem; border-radius: .8rem;
+  border: 1.5px solid var(--line); background: var(--wash); font-weight: 600; font-size: 1rem;
+}
+.input:focus { outline: none; border-color: var(--red); background: var(--paper); }
+.draw { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+.draw-col { display: grid; gap: .5rem; align-content: start; }
+.draw-vs { font-size: .75rem; font-weight: 700; color: var(--ink-2); text-align: center; }
+.team-in { display: flex; align-items: center; gap: .5rem; }
+.dot { width: .8rem; height: .8rem; border-radius: 50%; background: var(--tc, var(--red)); flex: none; }
+.row { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+.row--between { justify-content: space-between; }
+.stepper { display: inline-flex; align-items: center; border: 1.5px solid var(--line); border-radius: 999px; overflow: hidden; }
+.stepper button { width: 2.4rem; height: 2.4rem; background: none; border: 0; font-weight: 800; font-size: 1.1rem; }
+.stepper button:hover { background: var(--wash); color: var(--red); }
+.stepper output { min-width: 2rem; text-align: center; font-weight: 800; font-variant-numeric: tabular-nums; }
+.note { font-size: .82rem; color: var(--ink-2); }
+.assist { border: 1.5px dashed var(--line); border-radius: 1rem; padding: .9rem 1rem; display: grid; gap: .6rem; }
+.assist h3 { font-size: 1rem; font-weight: 700; font-family: var(--body); }
+.assist.is-on { border-style: solid; border-color: #1E9E63; }
+
+/* ---------- bracket ---------- */
+.bracket-wrap { flex: 1; display: grid; align-content: center; gap: 1.5rem; padding-block: 1rem 2rem; }
+.bracket-head { display: flex; align-items: end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.bracket-head h1 { font-size: clamp(2rem, 4.5vw, 3.6rem); font-weight: 800; letter-spacing: -.03em; }
+.bracket { display: grid; grid-template-columns: minmax(0, 1fr) clamp(1.5rem, 5vw, 5rem) minmax(0, 1fr); align-items: center; }
+.semis { display: grid; gap: clamp(1rem, 3vh, 2.5rem); }
+.join { align-self: stretch; margin-block: 22%; border: 3px solid var(--line); border-left: 0; border-radius: 0 1.2rem 1.2rem 0; position: relative; }
+.join::after { content: ""; position: absolute; left: 100%; top: 50%; width: 0; }
+.mcard { background: var(--paper); border: 1.5px solid var(--line); border-radius: 1.3rem; padding: 1rem 1.1rem; display: grid; gap: .6rem; }
+.mcard.is-next { border-color: var(--red); box-shadow: 0 18px 44px var(--shade); }
+.mcard-h { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: .85rem; color: var(--ink-2); }
+.mcard.is-next .mcard-h { color: var(--red); }
+.mrow { display: flex; align-items: center; gap: .6rem; font-family: var(--display); font-weight: 700; font-size: 1.35rem; min-width: 0; }
+.mrow span { min-width: 0; overflow-wrap: anywhere; flex: 1; }
+.mrow b { font-variant-numeric: tabular-nums; font-size: 1.5rem; }
+.mrow.is-out { opacity: .45; }
+.out { font-style: normal; font-family: var(--body); font-size: .7rem; font-weight: 800; border: 1.5px solid var(--line); color: var(--ink-2); padding: .1rem .5rem; border-radius: 999px; }
+.mcard-sub { font-size: .85rem; color: var(--ink-2); }
+.mrow.is-tbd { color: var(--ink-2); font-family: var(--body); font-weight: 600; font-size: 1rem; }
+.won { font-style: normal; font-family: var(--body); font-size: .7rem; font-weight: 800; background: var(--gold); color: var(--gold-ink); padding: .15rem .5rem; border-radius: 999px; }
+.mcard--final { padding: 1.3rem 1.3rem; }
+.mcard--final .mrow { font-size: 1.6rem; }
+
+/* ---------- match stage ---------- */
+.stage {
+  flex: 1; min-height: 0; display: grid; gap: clamp(.7rem, 1.8vw, 1.8rem);
+  grid-template-columns: minmax(8.5rem, 1fr) minmax(0, 3.6fr) minmax(8.5rem, 1fr);
+  padding-block: .4rem 1rem; position: relative;
+}
+.stage::before { /* centre ice */
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(circle at 50% 52%, var(--ice) 0 .9vmin, transparent calc(.9vmin + 1px)),
+    radial-gradient(circle at 50% 52%, transparent 0 calc(30vmin - 3px), var(--ice) calc(30vmin - 2px) 30vmin, transparent calc(30vmin + 1px));
+}
+.stage > * { position: relative; z-index: 1; }
+.team { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: .5rem; padding: 1.6rem .6rem; border-radius: 1.5rem; border: 2px solid transparent; min-width: 0; }
+.team.is-live { background: var(--paper); border-color: var(--tc); box-shadow: 0 20px 50px var(--shade); }
+.team.is-dim { opacity: .45; }
+.side { display: grid; gap: clamp(.6rem, 2vh, 1.2rem); align-content: center; min-width: 0; }
+.stage--four .team { padding: 1rem .6rem; gap: .35rem; }
+.stage--four .team-score { font-size: clamp(2.4rem, 4.4vw, 4.4rem); }
+.stage--four .team-name { font-size: 1.2rem; }
+.stage--four .strikes { min-height: 2.1rem; }
+.stage--four .strikes i { width: 2rem; height: 2rem; font-size: 1.15rem; }
+.team-flag { width: 2.6rem; height: .5rem; border-radius: 999px; background: var(--tc); }
+.team-name { font-family: var(--display); font-weight: 700; font-size: 1.4rem; line-height: 1.05; overflow-wrap: anywhere; text-wrap: balance; }
+.team-score { font-family: var(--display); font-weight: 800; font-size: clamp(3rem, 6.2vw, 6rem); line-height: .9; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.team-state { min-height: 1.8rem; display: inline-flex; align-items: center; padding: .15rem .75rem; border-radius: 999px; font-weight: 700; font-size: .8rem; background: var(--tc); color: var(--paper); }
+.team-state:empty { background: none; }
+.strikes { display: flex; gap: .35rem; min-height: 2.6rem; }
+.strikes i { width: 2.4rem; height: 2.4rem; border-radius: .6rem; border: 2px solid var(--line); display: grid; place-items: center; font-style: normal; font-weight: 800; font-size: 1.4rem; color: transparent; font-family: var(--display); }
+.strikes i.on { background: var(--red); border-color: var(--red); color: var(--on-red); }
+
+.centre { display: flex; flex-direction: column; gap: clamp(.6rem, 1.6vh, 1.1rem); min-width: 0; min-height: 0; }
+.chips { display: flex; gap: .4rem; flex-wrap: wrap; justify-content: center; }
+.chip { font-size: .78rem; font-weight: 700; padding: .25rem .7rem; border-radius: 999px; background: var(--paper); border: 1.5px solid var(--line); color: var(--ink-2); }
+.chip--hot { background: var(--gold); border-color: var(--gold); color: var(--gold-ink); }
+.q-text { text-align: center; font-weight: 700; font-size: clamp(1.5rem, 3.1vw, 3rem); letter-spacing: -.02em; line-height: 1.08; max-width: 24em; margin-inline: auto; }
+.board {
+  list-style: none; margin: 0; padding: 0; flex: 1; min-height: 0;
+  display: grid; grid-auto-flow: column; grid-template-rows: repeat(var(--rows), minmax(3.3rem, 5.4rem));
+  grid-auto-columns: minmax(0, 1fr); gap: .6rem; align-content: center;
+}
+.board.is-single { max-width: 34rem; width: 100%; margin-inline: auto; }
+.tile { perspective: 60rem; min-width: 0; }
+.tile-in { height: 100%; border-radius: .9rem; display: flex; align-items: stretch; overflow: hidden; }
+.tile-hide { width: 100%; height: 100%; border: 0; border-radius: .9rem; background: linear-gradient(180deg, var(--red), var(--red-deep)); display: grid; place-items: center; box-shadow: inset 0 -5px 0 rgba(0,0,0,.16); }
+.tile-hide:hover { filter: brightness(1.08); }
+.tile-num { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: rgba(255,255,255,.16); border: 2px solid rgba(255,255,255,.55); color: var(--on-red); display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 1.3rem; }
+.tile.is-open .tile-in { background: var(--face); color: var(--face-ink); box-shadow: 0 8px 22px var(--shade); }
+.tile-a { flex: 1; min-width: 0; display: flex; align-items: center; padding: .3rem .9rem; font-family: var(--display); font-weight: 700; font-size: clamp(1.05rem, 1.9vw, 1.75rem); line-height: 1.05; overflow-wrap: anywhere; }
+.tile-p { flex: none; width: 4.2rem; display: grid; place-items: center; background: var(--red); color: var(--on-red); font-family: var(--display); font-weight: 800; font-size: clamp(1.4rem, 2.3vw, 2.1rem); font-variant-numeric: tabular-nums; }
+.tile.is-late .tile-in { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--line); }
+.tile.is-late .tile-p { background: transparent; color: var(--ink-2); box-shadow: inset 2px 0 0 var(--line); }
+.tile.is-just .tile-in { animation: flip .55s cubic-bezier(.2, .8, .2, 1.15) both; }
+.tile.is-just.is-open:not(.is-late) .tile-in { animation: flip .55s cubic-bezier(.2, .8, .2, 1.15) both, glow 1.3s ease-out both; }
+@keyframes flip { from { transform: rotateX(-92deg); } to { transform: none; } }
+@keyframes glow { 0% { box-shadow: 0 0 0 0 var(--gold); } 30% { box-shadow: 0 0 0 .5rem var(--gold); } 100% { box-shadow: 0 8px 22px var(--shade); } }
+.pot { align-self: center; display: flex; align-items: baseline; gap: .7rem; font-weight: 700; color: var(--ink-2); }
+.pot b { font-family: var(--display); font-weight: 800; font-size: 2.4rem; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1; }
+.pot em { font-style: normal; font-weight: 800; color: var(--gold-ink); background: var(--gold); border-radius: 999px; padding: .1rem .6rem; }
+.line-x { align-self: center; max-width: 36em; text-align: center; font-size: 1.05rem; font-weight: 600; font-style: italic; background: var(--paper); border: 1.5px solid var(--line); border-radius: 1rem 1rem 1rem .2rem; padding: .5rem 1rem; }
+
+/* round intro */
+.intro { flex: 1; display: grid; place-content: center; justify-items: center; gap: 1rem; text-align: center; }
+.intro-n { font-family: var(--display); font-weight: 800; font-size: clamp(4rem, 11vw, 10rem); letter-spacing: -.05em; line-height: .85; color: var(--red); }
+.intro-of { font-size: 1.3rem; font-weight: 700; }
+.intro p { color: var(--ink-2); max-width: 26em; font-size: 1.05rem; text-wrap: balance; }
+
+/* result banner */
+.banner { align-self: center; text-align: center; background: var(--gold); color: var(--gold-ink); border-radius: 1.2rem; padding: .6rem 1.4rem; font-family: var(--display); font-weight: 800; font-size: clamp(1.2rem, 2.2vw, 1.9rem); }
+
+/* ---------- host bar ---------- */
+.host { background: var(--host); color: var(--host-ink); border-radius: 1.3rem 1.3rem 0 0; padding: .8rem 1.1rem calc(.8rem + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; margin-inline: calc(-1 * min(16px, 1vw)); }
+.host-cue { flex: 1 1 16rem; min-width: 0; display: grid; gap: .1rem; }
+.host-cue small { font-size: .7rem; font-weight: 700; color: var(--host-2); }
+.host-cue strong { font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
+.host-act { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; flex: 2 1 22rem; justify-content: flex-end; }
+.host form { display: flex; gap: .5rem; flex: 1 1 16rem; min-width: 0; }
+.host .input { background: var(--host-field); border-color: transparent; color: var(--host-ink); height: 3rem; font-size: 1.15rem; flex: 1; }
+.host .input::placeholder { color: var(--host-2); }
+.host .input:focus { border-color: var(--gold); background: var(--host-field); }
+.host .btn--line { color: var(--host-ink); border-color: var(--host-2); }
+.host .btn--line:hover { color: var(--gold); border-color: var(--gold); }
+.host .btn--team { background: var(--tc); color: var(--host); border-color: var(--tc); }
+.host .btn--undo { min-height: 2.4rem; padding-inline: .9rem; font-size: .85rem; color: var(--host-2); border-color: var(--host-field); background: transparent; }
+.host .btn--undo:hover { color: var(--host-ink); }
+.wait { display: inline-flex; align-items: center; gap: .6rem; font-weight: 700; font-size: 1.05rem; }
+.wait i { width: .7rem; height: .7rem; border-radius: 50%; background: var(--gold); animation: pulse 1s ease-in-out infinite; }
+.wait i:nth-child(2) { animation-delay: .15s; } .wait i:nth-child(3) { animation-delay: .3s; }
+@keyframes pulse { 0%, 100% { transform: scale(.5); opacity: .4; } 50% { transform: scale(1); opacity: 1; } }
+
+/* ---------- overlays ---------- */
+.strike-ov { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: var(--scrim); pointer-events: none; }
+.strike-ov div { display: flex; gap: 2vw; }
+.strike-ov span { width: min(24vw, 42vh); aspect-ratio: 1; max-width: 100%; border-radius: 12%; background: var(--red); color: var(--on-red); display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: min(20vw, 34vh); line-height: 1; border: .6vw solid var(--on-red); animation: stamp .35s cubic-bezier(.2, .9, .3, 1.3) both; }
+@keyframes stamp { from { transform: scale(2.2) rotate(-8deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.toast { position: fixed; left: 50%; top: calc(4.2rem + env(safe-area-inset-top, 0px)); transform: translateX(-50%); z-index: 70; background: var(--host); color: var(--host-ink); padding: .65rem 1.2rem; border-radius: 999px; font-weight: 700; box-shadow: 0 12px 30px var(--shade); max-width: calc(100% - 32px); text-align: center; }
+.modal-bg { position: fixed; inset: 0; z-index: 50; background: var(--scrim); display: grid; place-items: center; padding: 16px; overflow: auto; }
+.modal { background: var(--paper); color: var(--ink); border-radius: 1.5rem; padding: clamp(1.1rem, 2.5vw, 2rem); width: min(100%, 46rem); max-height: 100%; overflow: auto; display: grid; gap: 1rem; }
+.modal--wide { width: min(100%, 62rem); }
+.modal h2 { font-size: 1.8rem; font-weight: 800; letter-spacing: -.02em; }
+.modal-foot { display: flex; gap: .6rem; justify-content: flex-end; flex-wrap: wrap; }
+.rules { margin: 0; padding: 0; list-style: none; counter-reset: r; display: grid; gap: .7rem; }
+.rules li { counter-increment: r; display: grid; grid-template-columns: 2.2rem 1fr; gap: .8rem; align-items: start; font-size: 1.05rem; }
+.rules li::before { content: counter(r); width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--red); color: var(--on-red); display: grid; place-items: center; font-family: var(--display); font-weight: 800; }
+.rules b { font-family: var(--display); font-size: 1.15rem; }
+.pick-cat { font-family: var(--display); font-weight: 700; font-size: 1.1rem; margin-top: .4rem; }
+.pick-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: .5rem; }
+.pick { text-align: left; background: var(--wash); border: 1.5px solid var(--line); border-radius: .9rem; padding: .6rem .8rem; font-weight: 600; font-size: .92rem; display: grid; gap: .15rem; }
+.pick small { color: var(--ink-2); font-weight: 700; font-size: .72rem; }
+.pick:hover { border-color: var(--red); }
+.pick.is-current { border-color: var(--red); background: var(--paper); }
+.score-edit { display: grid; grid-template-columns: 1fr auto; gap: .7rem 1rem; align-items: center; }
+
+/* ---------- champion ---------- */
+.champ { flex: 1; display: grid; place-content: center; justify-items: center; text-align: center; gap: 1rem; padding-block: 2rem; position: relative; }
+.champ-k { font-weight: 800; font-size: 1.2rem; background: var(--gold); color: var(--gold-ink); padding: .3rem 1.1rem; border-radius: 999px; }
+.champ-name { font-size: clamp(3rem, 10vw, 9rem); font-weight: 800; letter-spacing: -.025em; line-height: .9; color: var(--red); overflow-wrap: anywhere; }
+.champ-score { font-size: 1.4rem; font-weight: 700; }
+#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40; }
+
+/* ---------- answer key ---------- */
+.key { max-width: 62rem; width: 100%; margin-inline: auto; padding-block: 1.2rem 3rem; display: grid; gap: 1.2rem; font-size: 15px; }
+.key h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -.02em; }
+.key h2 { font-size: 1.3rem; font-weight: 800; color: var(--red); margin-top: .8rem; }
+.key-warn { background: var(--gold); color: var(--gold-ink); border-radius: .8rem; padding: .6rem .9rem; font-weight: 700; }
+.key-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: .8rem; }
+.key-q { background: var(--paper); border: 1.5px solid var(--line); border-radius: .9rem; padding: .75rem .9rem; break-inside: avoid; }
+.key-q h3 { font-family: var(--body); font-size: .98rem; font-weight: 700; line-height: 1.25; margin-bottom: .4rem; }
+.key-q h3 small { color: var(--red); font-weight: 800; margin-right: .3rem; }
+.key-q ol { margin: 0; padding: 0; list-style: none; display: grid; gap: .1rem; }
+.key-q li { display: flex; justify-content: space-between; gap: .8rem; font-size: .9rem; border-top: 1px solid var(--line); padding-top: .15rem; }
+.key-q li b { font-variant-numeric: tabular-nums; }
+
+/* ---------- small screens ---------- */
+@media (max-width: 820px) {
+  .setup { grid-template-columns: 1fr; align-items: start; }
+  .bracket { grid-template-columns: 1fr; gap: 1rem; }
+  .join { display: none; }
+  .stage { grid-template-columns: 1fr 1fr; }
+  .stage::before { display: none; }
+  .centre { grid-column: 1 / -1; order: 3; }
+  .team { padding: .6rem .4rem; gap: .3rem; }
+  .team-name { font-size: 1.05rem; }
+  .team-score { font-size: 2.6rem; }
+  .strikes i { width: 1.8rem; height: 1.8rem; font-size: 1rem; }
+  .strikes { min-height: 1.8rem; }
+  .board { grid-auto-flow: row; grid-template-rows: none; grid-auto-rows: minmax(3.3rem, auto); grid-template-columns: 1fr; }
+  .draw { grid-template-columns: 1fr; }
+  .host { border-radius: 1rem 1rem 0 0; }
+  .host-act { justify-content: flex-start; }
+  .brand-org { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+@media print {
+  .top, .host, .key-warn, .key-back { display: none !important; }
+  body { background: #fff; color: #000; }
+  .key { font-size: 11px; }
+}
+</style>
+<div id="app"></div>
+<div id="strike" class="strike-ov" hidden></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<canvas id="confetti" hidden></canvas>
+<script>
+/* Question bank.
+   Each answer is [text shown on the board, points, accepted wordings separated by |].
+   SCHEDULE is the default running order: the qualifier all four teams play,
+   then the head-to-head final. Every other question is a spare. */
+const SCHEDULE = { q: ['c1', 'o1', 'c2', 'f1'], f: ['c9', 'w2', 'f9'] };
+const QUESTIONS = [
+  /* ---- Scheduled questions (see SCHEDULE) and spares ---- */
+  { id: 'c1', cat: 'canada', q: 'Name something Canadians say sorry for.', a: [
+    ['Bumping into someone', 36, 'bump|bumping into|bumped|walking into|running into|in the way|getting in the way|brushing past|collision'],
+    ['Being late', 20, 'late|lateness|running late|tardy'],
+    ['The weather', 14, 'weather|snow|winter|rain'],
+    ['Asking a question', 12, 'asking|question|bothering|interrupting|interrupt|excuse me|favour|favor|asking for help'],
+    ["Something that wasn't their fault", 11, 'not their fault|wasnt their fault|someone else|nothing|everything|no reason|other people|fault|someone elses mistake'],
+    ['Saying sorry too much', 7, 'saying sorry|apologizing|apologising|sorry too much|being sorry|apologizing too much'],
+  ]},
+  { id: 'o1', cat: 'office', q: 'Name something people do on a video call when their camera is off.', a: [
+    ['Eat', 27, 'eat|eating|snack|snacking|lunch|breakfast|food|cook|cooking'],
+    ['Scroll on their phone', 22, 'phone|scroll|scrolling|text|texting|instagram|tiktok|social media|shopping|online shopping'],
+    ['Answer emails', 18, 'email|emails|other work|multitask|multitasking|work|chat|messages|actual work'],
+    ['Laundry and chores', 13, 'laundry|chores|dishes|clean|cleaning|vacuum|fold|tidy|housework'],
+    ['Lie down', 11, 'bed|nap|napping|sleep|sleeping|lie down|lying down|couch|doze'],
+    ['Leave the room', 9, 'bathroom|washroom|leave|walk away|toilet|pee|walk the dog|wander off|go outside'],
+  ]},
+  { id: 'f1', cat: 'finance', q: 'Name a benefit people rush to use up before their plan year resets.', a: [
+    ['Massage', 34, 'massage|rmt|massage therapy|spa|registered massage'],
+    ['Dental', 24, 'dental|dentist|teeth|cleaning|teeth cleaning|hygienist|orthodontist|braces'],
+    ['Glasses and eye exams', 18, 'glasses|vision|eye exam|eyes|eye|contacts|contact lenses|optometrist|eyewear|specs|sunglasses|vision care'],
+    ['Physio', 11, 'physio|physiotherapy|physiotherapist|physical therapy'],
+    ['Chiropractor', 7, 'chiro|chiropractor|chiropractic'],
+    ['Therapy and counselling', 6, 'therapy|therapist|counselling|counseling|psychologist|mental health|psychotherapy|counsellor'],
+  ]},
+
+  { id: 'c2', cat: 'canada', q: 'Name a Canadian food every visitor has to try.', a: [
+    ['Poutine', 38, 'poutine|fries and gravy|cheese curds'],
+    ['Maple syrup', 22, 'maple|syrup|maple syrup|maple taffy'],
+    ['Butter tarts', 12, 'butter tart|butter tarts|tart|tarts'],
+    ['BeaverTails', 10, 'beaver tail|beaver tails|beavertail|beavertails'],
+    ['Nanaimo bars', 7, 'nanaimo|nanaimo bar'],
+    ['Montreal bagels or smoked meat', 6, 'smoked meat|montreal smoked meat|bagel|bagels|montreal bagel'],
+    ['Ketchup chips', 5, 'ketchup chips|ketchup|all dressed|all dressed chips'],
+  ]},
+  { id: 'o3', cat: 'office', q: 'Name something that mysteriously disappears from the office fridge.', a: [
+    ['Your lunch', 38, 'lunch|sandwich|food|meal|pasta|my lunch'],
+    ['Milk or cream', 22, 'milk|cream|creamer|oat milk|coffee cream'],
+    ['Yogurt', 13, 'yogurt|yoghurt'],
+    ['Leftover cake or pizza', 11, 'cake|pizza|dessert|birthday cake|donuts|leftover cake|leftover pizza'],
+    ['Pop and drinks', 9, 'pop|soda|drink|drinks|coke|juice|sparkling water|water|energy drink'],
+    ['Salad dressing', 7, 'dressing|condiment|condiments|ketchup|hot sauce|butter|mayo|sauce'],
+  ]},
+  { id: 'f3', cat: 'finance', q: 'Name something that makes Finance people panic at month-end.', a: [
+    ["Numbers that don't balance", 30, 'balance|balancing|reconcile|reconciliation|doesnt tie|tie out|variance|out of balance|numbers wrong|numbers off|discrepancy|off by a penny|wrong numbers|rec'],
+    ['Late entries', 22, 'late|journal entries|late entries|missing|accruals|submissions|late invoices|invoices'],
+    ['Excel crashing', 18, 'excel|spreadsheet|crash|crashed|not saved|corrupt|frozen|file wont open'],
+    ['The system going down', 13, 'system|sap|system down|outage|erp|server|network|wifi|oracle|workday|it issues'],
+    ['A question from the auditors', 9, 'audit|auditor|auditors'],
+    ['A last-minute change', 8, 'last minute|change|changes|adjustment|one more thing|boss|cfo|restatement'],
+  ]},
+
+  { id: 'c9', cat: 'canada', q: 'Name a word that instantly gives you away as Canadian.', a: [
+    ['"Eh"', 40, 'eh|ay|aye'],
+    ['"Sorry"', 25, 'sorry|sore-y|soary'],
+    ['"Toque"', 10, 'toque|tuque|touque'],
+    ['"Double-double"', 9, 'double double|doubledouble'],
+    ['"Loonie" or "Toonie"', 8, 'loonie|toonie|twoonie|loony|toony'],
+    ['"Washroom"', 5, 'washroom'],
+    ['"About"', 3, 'about|aboot|out and about'],
+  ]},
+  { id: 'w2', cat: 'wild', q: 'Name something adults pretend to understand.', a: [
+    ['Taxes', 27, 'tax|taxes|tax return|cra|income tax'],
+    ['Crypto', 21, 'crypto|bitcoin|blockchain|nft|nfts|cryptocurrency'],
+    ['The stock market', 16, 'stock|stocks|stock market|investing|investments|market|etfs|shares'],
+    ['Wine', 13, 'wine|wine list|wine tasting'],
+    ['Mortgage rates', 12, 'mortgage|interest|interest rates|rates|bank of canada|inflation|economy'],
+    ['Their own insurance policy', 11, 'insurance|policy|benefits|fine print|terms and conditions|contract|pension|coverage'],
+  ]},
+  { id: 'f9', cat: 'finance', q: 'Name something a CFO never wants to hear.', a: [
+    ['"We\'re over budget"', 34, 'over budget|budget|overspent|overspend|cost overrun|more money|need more money'],
+    ['"The auditors found something"', 22, 'audit|auditor|auditors|regulator|osfi|found something'],
+    ['"The numbers were wrong"', 18, 'wrong|error|mistake|restate|restatement|typo|miscalculated|wrong numbers|incorrect'],
+    ['"We missed the deadline"', 11, 'deadline|late|missed|delay|delayed|behind schedule'],
+    ['"The system is down"', 9, 'system|system down|outage|crash|crashed|hack|hacked|breach|cyber'],
+    ['"I didn\'t back it up"', 6, 'backup|back up|deleted|lost the file|no backup|didnt save'],
+  ]},
+
+  { id: 'w1', cat: 'wild', q: 'Name something you should never do at the office holiday party.', a: [
+    ['Have too much to drink', 36, 'drink|drunk|drinking|alcohol|booze|shots|wasted|too much wine'],
+    ['Tell the boss what you really think', 18, 'boss|honest|truth|complain|criticize|rant|roast|cfo|manager'],
+    ['Bust out your dance moves', 15, 'dance|dancing|twerk|dance moves|dance floor'],
+    ['Karaoke', 11, 'karaoke|sing|singing'],
+    ['Talk about pay', 10, 'salary|pay|raise|shop talk|bonus|talk about work|how much you make'],
+    ['Post it online', 10, 'post|instagram|social media|photos|video|online|linkedin|tiktok|film'],
+  ]},
+  { id: 'c6', cat: 'canada', q: "Name something you'd find at a Tim Hortons.", a: [
+    ['A double-double', 34, 'double double|doubledouble|coffee'],
+    ['Timbits', 28, 'timbit|timbits'],
+    ['Donuts', 14, 'donut|donuts|doughnut|doughnuts'],
+    ['A long drive-thru line', 10, 'line|lineup|line up|drive thru|drive through|drivethru|queue|long line'],
+    ['An Iced Capp', 8, 'iced capp|ice cap|icecap|iced cap|cappuccino|ice capp'],
+    ['A bagel', 6, 'bagel|sandwich|breakfast sandwich|wrap|farmers wrap'],
+  ]},
+  { id: 'o7', cat: 'office', q: 'Name something people say right before they ruin your Friday afternoon.', a: [
+    ['"Got a minute?"', 30, 'minute|got a sec|second|sec|moment|can we talk|quick call|call|quick chat|do you have a minute'],
+    ['"Quick question"', 22, 'question|quick question'],
+    ['"Just one small change"', 18, 'change|tweak|edit|one more thing|small|revision|update|small change'],
+    ['"It\'s urgent"', 14, 'urgent|asap|today|end of day|eod|rush|need this|by monday'],
+    ['"Before you go"', 10, 'before you go|before you leave|leaving|heading out|before'],
+    ['"The client called"', 6, 'client|customer|called|cfo|boss wants|the boss'],
+  ]},
+  { id: 'f4', cat: 'finance', q: 'Name something you hear in every Finance meeting.', a: [
+    ['"Let\'s take that offline"', 27, 'offline|take it offline|take that offline'],
+    ['"You\'re on mute"', 24, 'mute|on mute|muted'],
+    ['"What\'s driving the variance?"', 18, 'variance|driving|drivers|whats the variance'],
+    ['"Let\'s circle back"', 13, 'circle back|follow up|circle'],
+    ['"Is that in the budget?"', 10, 'budget|forecast|in the budget'],
+    ['"Can you see my screen?"', 8, 'screen|see my screen|share|sharing|share my screen'],
+  ]},
+  { id: 'c8', cat: 'canada', q: "Name something Canadians do when it's minus thirty outside.", a: [
+    ['Stay home', 28, 'stay home|stay inside|stay in|indoors|netflix|work from home|hibernate|nothing|stay in bed'],
+    ['Complain about it', 22, 'complain|complaining|whine|talk about it|talk about the weather'],
+    ['Go to work anyway', 15, 'go to work|work|carry on|as usual|normal|business as usual'],
+    ['Plug in the car', 14, 'plug|plug in|block heater|warm up the car|start the car|remote start|car'],
+    ['Layer up', 11, 'layer|layers|bundle|parka|long johns|toque|dress warm|coat|jacket'],
+    ['Play outside anyway', 10, 'hockey|skate|skating|ski|skiing|outdoor rink|toboggan|play outside|snowmobile'],
+  ]},
+  { id: 'o5', cat: 'office', q: 'Name the real reason people come into the office.', a: [
+    ['Free food', 30, 'food|lunch|pizza|snacks|treats|donuts|free lunch|potluck|free food'],
+    ['To see their work friends', 24, 'friends|colleagues|coworkers|people|gossip|social|socialize|team|chat'],
+    ['The boss said so', 20, 'boss|mandate|manager|required|policy|mandatory|forced'],
+    ['Two monitors and good wifi', 12, 'monitor|monitors|wifi|internet|printer|desk|screens|equipment'],
+    ['To escape the house', 9, 'escape|kids|spouse|family|house|quiet|home|get out'],
+    ['Free coffee', 5, 'coffee|free coffee'],
+  ]},
+  { id: 'w6', cat: 'wild', q: 'Name something people do the second their out-of-office goes on.', a: [
+    ['Check their email anyway', 30, 'email|emails|check|inbox|work anyway'],
+    ['Nap', 22, 'nap|sleep|sleep in|bed|rest|relax|nothing'],
+    ['Leave for the airport or the cottage', 18, 'airport|cottage|drive|leave|flight|travel|vacation|road trip|trip'],
+    ['Pour a drink', 14, 'drink|wine|beer|cocktail|pour|bar|patio'],
+    ['Turn off notifications', 10, 'notifications|mute|turn off|phone off|silence|log off|shut the laptop|close the laptop|laptop'],
+    ['Forget their password', 6, 'password|forget'],
+  ]},
+  { id: 'f8', cat: 'finance', q: 'Name something that drives Excel users crazy.', a: [
+    ['Crashing before you saved', 30, 'crash|crashes|crashing|freeze|freezes|not responding|lost work|didnt save|autosave|unsaved'],
+    ['Merged cells', 20, 'merged|merge|merged cells'],
+    ['Broken formulas', 18, 'ref|formula|formulas|error|errors|broken|vlookup|circular|circular reference|broken links'],
+    ['Someone typing over your formulas', 13, 'hardcode|hardcoded|hard coded|overwrite|overwrote|typed over|someone changed|pasted values|hardcoding'],
+    ["A file that's way too slow", 11, 'slow|loading|huge file|large file|big file|calculating|lag'],
+    ['Hidden rows and columns', 8, 'hidden|hide|hidden columns|hidden rows|hidden tabs'],
+  ]},
+  { id: 'c4', cat: 'canada', q: 'Name the first thing Canadians do when it hits plus five in spring.', a: [
+    ['Wear shorts', 34, 'shorts|t-shirt|tshirt|sandals|flip flops|no jacket|ditch the coat'],
+    ['Hit the patio', 24, 'patio|beer|drink|drinks'],
+    ['Fire up the barbecue', 16, 'bbq|barbecue|barbeque|grill|grilling'],
+    ['Go for a walk', 11, 'walk|run|bike|hike|outside|go outside|park|jog'],
+    ['Wash the car', 8, 'wash|car wash|wash the car'],
+    ['Swap the winter tires', 7, 'tires|tire|winter tires'],
+  ]},
+  { id: 'o2', cat: 'office', q: 'Name a reason your coworker is "working from home" today.', a: [
+    ['Waiting for a delivery or repair', 26, 'delivery|repair|plumber|furnace|package|contractor|cable guy|technician|appliance|internet guy'],
+    ['"Not feeling great"', 22, 'sick|cold|cough|not feeling|unwell|flu|headache|hungover|hangover'],
+    ['The weather', 19, 'weather|snow|storm|snowstorm|ice|freezing rain|roads'],
+    ['The kids or the dog', 14, 'kid|kids|child|daycare|dog|pet|vet|school|pa day|puppy|cat'],
+    ['Car trouble', 10, 'car|transit|go train|ttc|traffic|bus|flat tire|commute'],
+    ['Wanted to stay in pyjamas', 9, 'pyjamas|pajamas|pjs|lazy|didnt feel like it|sleep in|sweatpants'],
+  ]},
+  { id: 'f7', cat: 'finance', q: 'Name an excuse for handing in your expense report late.', a: [
+    ['"I lost the receipts"', 31, 'receipt|receipts|lost'],
+    ['"I forgot"', 24, 'forgot|forget|slipped my mind'],
+    ['"I was too busy"', 17, 'busy|swamped|no time|workload|month end'],
+    ['"The system was down"', 12, 'system|system down|concur|website|app|login|password|technical'],
+    ['"I was on vacation"', 9, 'vacation|holiday|away|travelling|traveling|out of office|sick'],
+    ['"I was waiting on my manager"', 7, 'manager|boss|approval|approve|waiting'],
+  ]},
+  { id: 'w5', cat: 'wild', q: 'Name what someone is really doing when they text "on my way".', a: [
+    ['Still in bed', 28, 'bed|sleeping|asleep|waking up|lying'],
+    ['Getting dressed', 24, 'dressed|dressing|clothes|getting ready|makeup|hair|ready'],
+    ['In the shower', 18, 'shower|showering|bath'],
+    ['Hunting for their keys', 12, 'keys|key|wallet|looking for'],
+    ['Watching TV or scrolling', 10, 'tv|netflix|couch|show|watching|game|scrolling|phone'],
+    ['Still at work', 8, 'work|office|meeting|desk'],
+  ]},
+  { id: 'c5', cat: 'canada', q: 'Name a famous Canadian.', a: [
+    ['Ryan Reynolds', 22, 'ryan reynolds|reynolds'],
+    ['Drake', 19, 'drake|drizzy'],
+    ['Celine Dion', 16, 'celine|dion|celine dion'],
+    ['Wayne Gretzky', 14, 'gretzky|wayne gretzky|the great one'],
+    ['Justin Bieber', 11, 'bieber|justin bieber'],
+    ['Keanu Reeves', 9, 'keanu|reeves|keanu reeves'],
+    ['Shania Twain', 7, 'shania|twain|shania twain'],
+  ]},
+  { id: 'o8', cat: 'office', q: 'Name a little white lie people tell at work.', a: [
+    ['"I didn\'t see your email"', 26, 'email|didnt see|spam|junk|missed your message|message'],
+    ['"I\'m five minutes away"', 22, 'minutes away|on my way|five minutes|almost there|traffic|running late|late'],
+    ['"It\'s almost done"', 20, 'almost done|nearly done|working on it|done|finished|almost finished|on it'],
+    ['"Great idea!"', 13, 'great idea|love it|sounds great|good idea|love that|idea'],
+    ['"I was on mute"', 10, 'mute|connection|wifi|camera|internet|technical'],
+    ['"I\'m fine"', 9, 'fine|good|no worries|not a problem|happy to help|okay'],
+  ]},
+  { id: 'f10', cat: 'finance', q: 'Name something people dream of doing when they retire.', a: [
+    ['Travel', 36, 'travel|trip|world|cruise|vacation|europe|see the world'],
+    ['Move to the cottage', 18, 'cottage|lake|cabin|muskoka'],
+    ['Golf', 15, 'golf|golfing'],
+    ['Move somewhere warm', 13, 'warm|florida|south|snowbird|beach|mexico|arizona|hot'],
+    ['Absolutely nothing', 10, 'nothing|sleep|sleep in|relax|nap|rest'],
+    ['Spoil the grandkids', 8, 'grandkids|grandchildren|family|kids'],
+  ]},
+  { id: 'w3', cat: 'wild', q: "Name something on every Canadian's winter survival list.", a: [
+    ['A parka', 27, 'parka|coat|jacket|winter coat'],
+    ['Winter tires', 21, 'tires|tire|winter tires'],
+    ['A shovel', 17, 'shovel|snowblower|snow blower|salt'],
+    ['A toque and mitts', 15, 'toque|mitts|mittens|gloves|hat|scarf|tuque'],
+    ['An ice scraper', 11, 'scraper|brush|snow brush|windshield|ice scraper'],
+    ['Boots', 9, 'boots|boot|winter boots'],
+  ]},
+  { id: 'c7', cat: 'canada', q: 'Name a sport Canadians go wild for.', a: [
+    ['Hockey', 48, 'hockey|ice hockey'],
+    ['Curling', 14, 'curling'],
+    ['Basketball', 12, 'basketball|raptors'],
+    ['Baseball', 10, 'baseball|blue jays|jays'],
+    ['Football', 8, 'football|cfl|grey cup'],
+    ['Lacrosse', 5, 'lacrosse'],
+    ['Soccer', 3, 'soccer'],
+  ]},
+  { id: 'o4', cat: 'office', q: 'Name something people do to look like they were listening in a meeting.', a: [
+    ['Nod', 33, 'nod|nodding'],
+    ['Take notes', 25, 'notes|write|writing|type|typing|take notes'],
+    ['Say "great point"', 18, 'great point|good point|agree|agreed|totally|absolutely|compliment|say something'],
+    ['Ask someone to repeat it', 12, 'repeat|say that again|again|clarify|question|ask'],
+    ['Blame the connection', 7, 'connection|wifi|internet|froze|cut out|breaking up|mute'],
+    ['Stare thoughtfully', 5, 'stare|eye contact|look|thoughtful|squint|hmm|chin'],
+  ]},
+  { id: 'f2', cat: 'finance', q: 'Name something Canada Life helps Canadians protect.', a: [
+    ['Their family', 32, 'family|loved ones|kids|children|spouse|dependents'],
+    ['Their income', 21, 'income|paycheque|paycheck|salary|earnings|wages|disability'],
+    ['Their health', 18, 'health|wellness|wellbeing|medical'],
+    ['Their retirement', 14, 'retirement|savings|pension|rrsp|nest egg|investments|money|wealth|future'],
+    ['Their home', 9, 'home|mortgage|house'],
+    ['Their business', 6, 'business|company|employees'],
+  ]},
+  { id: 'w4', cat: 'wild', q: 'Name something people buy and never use.', a: [
+    ['A gym membership', 32, 'gym|membership|gym membership'],
+    ['Exercise equipment', 20, 'treadmill|peloton|bike|weights|exercise|equipment|yoga mat|elliptical'],
+    ['Kitchen gadgets', 18, 'kitchen|gadget|air fryer|blender|juicer|bread maker|instant pot|appliance|slow cooker'],
+    ['Books', 12, 'book|books|cookbook'],
+    ['A planner', 10, 'planner|journal|notebook|agenda|diary'],
+    ['A guitar', 8, 'guitar|instrument|piano|ukulele'],
+  ]},
+  { id: 'c10', cat: 'canada', q: 'Name an animal on a Canadian coin.', a: [
+    ['Loon', 38, 'loon|loonie'],
+    ['Beaver', 27, 'beaver'],
+    ['Polar bear', 20, 'polar bear|bear'],
+    ['Caribou', 15, 'caribou|reindeer|moose|elk|deer'],
+  ]},
+  { id: 'o6', cat: 'office', q: "Name something you'd find in a coworker's desk drawer.", a: [
+    ['Snacks', 34, 'snack|snacks|candy|chocolate|granola|chips|food|gum|cookies'],
+    ['Pens', 20, 'pen|pens|pencil|highlighter|marker|stationery|sticky notes|post-its|stapler|paper clips'],
+    ['Takeout ketchup and cutlery', 15, 'ketchup|cutlery|fork|forks|napkins|chopsticks|soy sauce|packets|salt|takeout'],
+    ['Chargers and cables', 12, 'charger|chargers|cable|cables|cord|cords|headphones|earbuds|mouse'],
+    ['Advil', 10, 'advil|tylenol|medicine|pills|painkillers|aspirin|tums|meds'],
+    ['Old business cards', 9, 'business card|business cards|cards|old papers|paper|files|documents'],
+  ]},
+  { id: 'f6', cat: 'finance', q: 'Name something an accountant would take to a desert island.', a: [
+    ['A calculator', 33, 'calculator|adding machine'],
+    ['A laptop', 25, 'laptop|computer|excel|spreadsheet'],
+    ['Coffee', 17, 'coffee|caffeine|espresso|tim hortons|tims'],
+    ['Receipts', 10, 'receipts|receipt|expense report|invoices'],
+    ['A budget', 8, 'budget|forecast'],
+    ['A pencil', 7, 'pencil|pen|paper|notebook|ledger'],
+  ]},
+  { id: 'c11', cat: 'canada', q: 'Name one of the Great Lakes.', a: [
+    ['Ontario', 30, 'ontario|lake ontario'],
+    ['Superior', 25, 'superior|lake superior'],
+    ['Erie', 18, 'erie|lake erie'],
+    ['Huron', 15, 'huron|lake huron'],
+    ['Michigan', 12, 'michigan|lake michigan'],
+  ]},
+  { id: 'c12', cat: 'canada', q: 'Name something Canada gave the world.', a: [
+    ['Basketball', 28, 'basketball'],
+    ['Insulin', 22, 'insulin'],
+    ['Hockey', 18, 'hockey|ice hockey'],
+    ['The telephone', 13, 'telephone|phone'],
+    ['Hawaiian pizza', 8, 'hawaiian pizza|pineapple pizza|pineapple on pizza|hawaiian'],
+    ['The snowmobile', 6, 'snowmobile|ski-doo|skidoo|ski doo'],
+    ['Peanut butter', 5, 'peanut butter'],
+  ]},
+  { id: 'f5', cat: 'finance', q: 'Name a city with a major Canada Life office.', a: [
+    ['Winnipeg', 35, 'winnipeg'],
+    ['Toronto', 27, 'toronto'],
+    ['London', 20, 'london'],
+    ['Montreal', 10, 'montreal'],
+    ['Regina', 8, 'regina'],
+  ]},
+];
+
+/* Finance Feud: game engine and screens. Plain DOM, no libraries.
+   Stage 1, the qualifier: all four teams play the same boards, taking turns.
+   Stage 2, the final: the top two play head-to-head with face-off, strikes and steal. */
+const Feud = (() => {
+  'use strict';
+
+  const CATS = { canada: 'True North', office: 'Office life', finance: 'Canada Life and Finance', wild: 'Wild cards' };
+  const NAMES = { q: 'Qualifier', f: 'The Final' };
+  const STORE = 'finance-feud-state-v2';
+  const ORDER = SCHEDULE.q.concat(SCHEDULE.f);
+  QUESTIONS.forEach(q => { if (!ORDER.includes(q.id)) ORDER.push(q.id); });
+  const SPARES = ORDER.slice(SCHEDULE.q.length + SCHEDULE.f.length);
+  const QMAP = {};
+  QUESTIONS.forEach(q => { QMAP[q.id] = Object.assign({ no: ORDER.indexOf(q.id) + 1 }, q); });
+
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const other = t => (t === 0 ? 1 : 0);
+
+  /* ---------------- state ---------------- */
+  const fresh = () => ({
+    v: 2, screen: 'setup', org: 'Canada Life Finance',
+    teams: ['The Accrual World', 'Ledger Legends', 'Fiscal Cliffhangers', 'Margin Callers'],
+    order: [0, 1, 2, 3], roundsQ: 4, roundsF: 3, sound: true,
+    stages: {
+      q: { done: false, rank: null, score: [0, 0, 0, 0] },
+      f: { t: [null, null], score: [0, 0], winner: null },
+    },
+    used: [], match: null,
+  });
+  let S = fresh();
+  const ui = { modal: null, menu: false, pending: null, token: 0, line: '', just: null, resumed: false };
+  const hist = [];
+  const X = {}; // optional add-on hooks, filled in by an add-on script when present
+
+  function save() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) { /* storage is optional */ } }
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORE);
+      if (!raw) return false;
+      const d = JSON.parse(raw);
+      if (d && d.v === 2 && Array.isArray(d.teams) && d.stages) { S = d; return true; }
+    } catch (e) { /* ignore */ }
+    return false;
+  }
+  function commit(fn) {
+    hist.push(JSON.stringify(S));
+    if (hist.length > 80) hist.shift();
+    fn();
+    save();
+    render();
+  }
+  function undo() {
+    if (!hist.length) { toast('Nothing to undo'); return; }
+    cancelPending();
+    S = JSON.parse(hist.pop());
+    ui.line = '';
+    save(); render();
+    toast('Last step undone');
+  }
+
+  /* ---------------- sound ---------------- */
+  let actx = null;
+  function audio() {
+    if (!S.sound) return null;
+    try {
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+    } catch (e) { return null; }
+    return actx;
+  }
+  function tone(f, at, dur, type, vol) {
+    const a = audio(); if (!a) return;
+    const o = a.createOscillator(), g = a.createGain(), t = a.currentTime + at;
+    o.type = type || 'triangle'; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol || 0.22, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + dur + 0.05);
+  }
+  const sfx = {
+    ding() { tone(988, 0, 0.18); tone(1319, 0.1, 0.6); },
+    top() { tone(784, 0, 0.16); tone(988, 0.1, 0.16); tone(1319, 0.2, 0.16); tone(1568, 0.3, 0.8); },
+    buzz() { tone(116, 0, 0.7, 'sawtooth', 0.2); tone(110, 0, 0.7, 'square', 0.12); },
+    pop() { tone(520, 0, 0.12, 'sine', 0.15); },
+    win() { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.13, 0.3)); tone(1319, 0.55, 1.1); },
+    fanfare() { [523, 523, 523, 698, 880, 784, 1047].forEach((f, i) => tone(f, i * 0.16, 0.34, 'triangle', 0.25)); },
+  };
+
+  /* ---------------- answer matching ---------------- */
+  const STOP = new Set(('a an the my your their our his her to of for it its is are was be being some that this you we they them ' +
+    'with and or really very just so i im me when by at from they their theyre were').split(' '));
+  function norm(s) {
+    return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[’'`]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+  }
+  function stem(w) {
+    if (w.length > 4) {
+      if (/ies$/.test(w)) w = w.slice(0, -3) + 'y';
+      else if (/(ss|x|ch|sh)es$/.test(w)) w = w.slice(0, -2);
+      else if (/s$/.test(w) && !/ss$/.test(w)) w = w.slice(0, -1);
+    } else if (w.length === 4 && /[^s]s$/.test(w)) w = w.slice(0, -1);
+    if (w.length > 5 && /ing$/.test(w)) {
+      w = w.slice(0, -3);
+      if (/([bdgmnprt])\1$/.test(w)) w = w.slice(0, -1);
+    } else if (w.length > 4 && /ed$/.test(w)) w = w.slice(0, -2);
+    if (w.length >= 4 && /e$/.test(w)) w = w.slice(0, -1);
+    return w;
+  }
+  const toks = s => norm(s).split(' ').filter(w => w && !STOP.has(w)).map(stem);
+  function lev(a, b, max) {
+    if (Math.abs(a.length - b.length) > max) return max + 1;
+    let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i];
+      for (let j = 1; j <= b.length; j++) {
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      }
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+  function near(a, b) {
+    if (a === b) return true;
+    const n = Math.min(a.length, b.length);
+    if (n < 5) return false;
+    const max = n >= 8 ? 2 : 1;
+    return lev(a, b, max) <= max;
+  }
+  function keysOf(ans) { return [ans[0]].concat(String(ans[2] || '').split('|')).filter(Boolean); }
+  /* strict = the typed words are exactly one accepted wording.
+     loose  = every word of an accepted wording appears in what was typed (small typos allowed). */
+  function matchLocal(text, q, strict) {
+    const it = toks(text), joined = norm(text).replace(/ /g, '');
+    if (!it.length && !joined) return { idx: -1 };
+    let best = -1, bestScore = 0;
+    q.a.forEach((ans, i) => {
+      keysOf(ans).forEach(k => {
+        const kt = toks(k);
+        if (!kt.length) return;
+        let ok, score = kt.join('').length;
+        if (norm(k).replace(/ /g, '') === joined) { ok = true; score += 100; }
+        else if (strict) ok = kt.length === it.length && kt.every(a => it.includes(a));
+        else ok = kt.every(a => it.some(b => near(a, b)));
+        if (ok && score > bestScore) { bestScore = score; best = i; }
+      });
+    });
+    return { idx: best };
+  }
+
+  /* ---------------- tournament flow ---------------- */
+  const multFor = (key, i, total) => {
+    if (key === 'f') return i === total - 1 ? 3 : (i === total - 2 && total >= 3 ? 2 : 1);
+    return i === total - 1 ? 2 : 1;
+  };
+  function pickQuestion(key, i, total, tiebreak) {
+    const plan = SCHEDULE[key];
+    const want = tiebreak ? null : i === total - 1 ? plan[plan.length - 1] : i < plan.length - 1 ? plan[i] : null;
+    if (want && !S.used.includes(want)) return want;
+    const spare = SPARES.find(id => !S.used.includes(id));
+    if (spare) return spare;
+    const any = ORDER.find(id => !S.used.includes(id));
+    return any || ORDER[0];
+  }
+  function newRound(m, tiebreak) {
+    const qid = pickQuestion(m.key, m.round, m.total, tiebreak);
+    const q = QMAP[qid];
+    m.r = {
+      qid, mult: tiebreak ? 1 : multFor(m.key, m.round, m.total), tiebreak: !!tiebreak, phase: 'intro',
+      shown: q.a.map(() => false), by: q.a.map(() => null), pot: 0, strikes: 0, control: null,
+      fo: { turn: null, first: null, hit: null, n: 0, fresh: false }, winner: null, award: 0,
+    };
+    if (m.mode === 'all') {
+      m.r.out = m.t.map(() => 0);      // strikes per team this round
+      m.r.earned = m.t.map(() => 0);   // points banked per team this round
+      m.r.turn = m.players[m.round % m.players.length];
+    }
+  }
+  function startMatch(key) {
+    commit(() => {
+      if (key === 'q') {
+        S.match = { key, mode: 'all', t: S.order.slice(), score: [0, 0, 0, 0], tb: [0, 0, 0, 0], players: [0, 1, 2, 3], round: 0, total: S.roundsQ, done: false };
+      } else {
+        S.match = { key, mode: 'duel', t: S.stages.f.t.slice(), score: [0, 0], round: 0, total: S.roundsF, done: false };
+      }
+      newRound(S.match, false);
+      S.screen = 'match';
+    });
+    ui.line = '';
+  }
+  function setQuestion(qid) {
+    commit(() => {
+      const r = S.match.r, q = QMAP[qid];
+      r.qid = qid; r.shown = q.a.map(() => false); r.by = q.a.map(() => null);
+    });
+  }
+  function showQuestion() {
+    sfx.pop();
+    commit(() => {
+      const m = S.match, r = m.r;
+      r.phase = m.mode === 'all' ? 'turns' : 'faceoff';
+      if (!S.used.includes(r.qid)) S.used.push(r.qid);
+    });
+  }
+  function buzz(team) { commit(() => { const fo = S.match.r.fo; fo.turn = team; fo.first = team; fo.n = 0; fo.fresh = false; }); }
+  function actingTeam() {
+    const r = S.match.r;
+    if (r.phase === 'turns') return r.turn;
+    if (r.phase === 'faceoff') return r.fo.turn;
+    if (r.phase === 'play') return r.control;
+    if (r.phase === 'steal') return other(r.control);
+    return null;
+  }
+  function endRound(r, m, w) {
+    r.winner = w; r.award = r.pot * r.mult; m.score[w] += r.award; r.phase = 'reveal';
+  }
+  /* qualifier helpers */
+  const rankKey = (m, s) => m.score[s] * 100000 + m.tb[s];
+  const ranked = m => m.t.map((_, s) => s).sort((a, b) => rankKey(m, b) - rankKey(m, a));
+  const cutTied = m => { const o = ranked(m); return rankKey(m, o[1]) === rankKey(m, o[2]); };
+  function advance(m, r) { // next team that still has a strike left, or end the round
+    const n = m.players.length, at = m.players.indexOf(r.turn);
+    for (let k = 1; k <= n; k++) {
+      const seat = m.players[(at + k) % n];
+      if (r.out[seat] < 2) { r.turn = seat; return true; }
+    }
+    r.phase = 'reveal';
+    return false;
+  }
+
+  function hit(idx) {
+    const m = S.match, r = m.r, q = QMAP[r.qid];
+    if (r.shown[idx]) return;
+    const team = actingTeam();
+    if (r.phase === 'reveal') { // showing what nobody found
+      sfx.pop(); ui.just = idx;
+      commit(() => { r.shown[idx] = true; r.by[idx] = 'late'; });
+      return;
+    }
+    if (team == null) return;
+    ui.just = idx;
+    let finished = false;
+    commit(() => {
+      r.shown[idx] = true; r.by[idx] = team; r.pot += q.a[idx][1];
+      if (r.phase === 'turns') {
+        const pts = q.a[idx][1] * r.mult;
+        r.earned[team] += pts;
+        if (r.tiebreak) m.tb[team] += pts; else m.score[team] += pts;
+        if (r.shown.every(Boolean)) { r.phase = 'reveal'; finished = true; } else advance(m, r);
+      } else if (r.phase === 'faceoff') {
+        const fo = r.fo;
+        fo.fresh = false;
+        if (idx === 0) { fo.winner = team; r.phase = 'choose'; }
+        else if (fo.n === 0) { fo.hit = { team, idx }; fo.n = 1; fo.turn = other(team); }
+        else { fo.winner = fo.hit && fo.hit.idx < idx ? fo.hit.team : team; r.phase = 'choose'; }
+      } else if (r.phase === 'play') {
+        if (r.shown.every(Boolean)) { endRound(r, m, r.control); finished = true; }
+      } else if (r.phase === 'steal') { endRound(r, m, team); finished = true; }
+    });
+    if (finished) sfx.win(); else if (idx === 0) sfx.top(); else sfx.ding();
+  }
+  function miss() {
+    const m = S.match, r = m.r;
+    if (!['turns', 'faceoff', 'play', 'steal'].includes(r.phase) || actingTeam() == null) return;
+    sfx.buzz();
+    let count = 1, ended = false;
+    commit(() => {
+      if (r.phase === 'turns') {
+        r.out[r.turn] += 1; count = r.out[r.turn];
+        ended = !advance(m, r);
+      } else if (r.phase === 'faceoff') {
+        const fo = r.fo;
+        if (fo.n === 0) { fo.n = 1; fo.turn = other(fo.turn); fo.fresh = false; }
+        else if (fo.hit) { fo.winner = fo.hit.team; r.phase = 'choose'; }
+        else { fo.n = 0; fo.turn = fo.first; fo.fresh = true; }
+      } else if (r.phase === 'play') {
+        r.strikes += 1; count = r.strikes;
+        if (r.strikes >= 3) r.phase = 'steal';
+      } else { endRound(r, m, r.control); ended = true; }
+    });
+    strikeOverlay(count);
+    if (ended) setTimeout(() => sfx.win(), 900);
+  }
+  function choose(play) {
+    commit(() => { const r = S.match.r; r.control = play ? r.fo.winner : other(r.fo.winner); r.strikes = 0; r.phase = 'play'; });
+  }
+  function revealNext() {
+    const r = S.match.r;
+    for (let i = r.shown.length - 1; i >= 0; i--) if (!r.shown[i]) { hit(i); return; }
+  }
+  function nextRound() {
+    ui.line = '';
+    const m = S.match;
+    const last = m.round >= m.total - 1;
+    if (!last) { commit(() => { m.round += 1; newRound(m, false); }); return; }
+    if (m.mode === 'all') {
+      if (cutTied(m)) {
+        commit(() => {
+          const o = ranked(m), k = rankKey(m, o[1]);
+          m.players = m.t.map((_, s) => s).filter(s => rankKey(m, s) === k);
+          m.round += 1; m.total += 1; newRound(m, true);
+        });
+        return;
+      }
+      sfx.fanfare();
+      commit(() => {
+        const o = ranked(m);
+        m.done = true; m.rank = o;
+        const score = [0, 0, 0, 0];
+        m.t.forEach((ti, s) => { score[ti] = m.score[s]; });
+        S.stages.q = { done: true, rank: o.map(s => m.t[s]), score };
+        S.stages.f.t = [m.t[o[0]], m.t[o[1]]];
+      });
+      return;
+    }
+    if (m.score[0] === m.score[1]) { commit(() => { m.round += 1; m.total += 1; newRound(m, true); }); return; }
+    sfx.fanfare();
+    commit(() => {
+      const w = m.score[0] > m.score[1] ? 0 : 1;
+      S.stages.f.score = m.score.slice(); S.stages.f.winner = m.t[w]; m.done = true; m.won = w;
+      S.screen = 'champion';
+    });
+    confetti();
+  }
+
+  /* typed answers */
+  function cancelPending() { ui.token += 1; if (ui.pending) { ui.pending = null; if (X.cancel) X.cancel(); } }
+  async function submit(text) {
+    text = String(text || '').trim();
+    if (!text || ui.pending || actingTeam() == null) return;
+    const r = S.match.r, q = QMAP[r.qid], team = actingTeam();
+    const token = ++ui.token;
+    ui.line = '';
+    let res = matchLocal(text, q, true), judged = false;
+    if (res.idx < 0 && X.judge && X.ready && X.ready()) {
+      ui.pending = { text }; render();
+      const out = await X.judge({ q, shown: r.shown.slice(), text, team: S.teams[S.match.t[team]] });
+      if (token !== ui.token) return;
+      ui.pending = null;
+      if (out) { res = out; judged = true; if (out.line) ui.line = out.line; }
+    }
+    if (res.idx < 0 && !judged) res = matchLocal(text, q, false);
+    const dup = res.idx >= 0 && r.shown[res.idx];
+    if (dup) { toast('Already on the board. Ask for another answer.'); render(); }
+    else if (res.idx >= 0) hit(res.idx);
+    else miss();
+    if (!judged && X.after && X.ready && X.ready()) {
+      X.after({ q, text, idx: dup ? -1 : res.idx, dup, team: S.teams[S.match.t[team]], token });
+    }
+  }
+  function setLine(text, token) { if (token === ui.token && S.screen === 'match') { ui.line = text; render(); } }
+
+  /* ---------------- overlays ---------------- */
+  let strikeTimer = 0, toastTimer = 0;
+  function strikeOverlay(n) {
+    const el = document.getElementById('strike');
+    el.innerHTML = '<div>' + '<span>✕</span>'.repeat(Math.max(1, Math.min(3, n))) + '</div>';
+    el.hidden = false;
+    clearTimeout(strikeTimer);
+    strikeTimer = setTimeout(() => { el.hidden = true; }, 1150);
+  }
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg; el.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.hidden = true; }, 2600);
+  }
+  function confetti() {
+    const cv = document.getElementById('confetti');
+    if (!cv || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+    const ctx = cv.getContext('2d'), W = cv.width = innerWidth, H = cv.height = innerHeight;
+    const cols = ['#D02927', '#FFFFFF', '#F4B740', '#A31C1E', '#FFD98A'];
+    const bits = Array.from({ length: 170 }, () => ({
+      x: Math.random() * W, y: -20 - Math.random() * H * 0.6, w: 6 + Math.random() * 8, h: 10 + Math.random() * 10,
+      vy: 2 + Math.random() * 4, vx: -1.5 + Math.random() * 3, r: Math.random() * 6, vr: -0.2 + Math.random() * 0.4,
+      c: cols[(Math.random() * cols.length) | 0],
+    }));
+    cv.hidden = false;
+    const t0 = performance.now();
+    (function frame(t) {
+      ctx.clearRect(0, 0, W, H);
+      bits.forEach(b => {
+        b.x += b.vx; b.y += b.vy; b.r += b.vr;
+        ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.r); ctx.fillStyle = b.c;
+        ctx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h); ctx.restore();
+      });
+      if (t - t0 < 7000 && S.screen === 'champion') requestAnimationFrame(frame);
+      else { ctx.clearRect(0, 0, W, H); cv.hidden = true; }
+    })(t0);
+  }
+
+  /* ---------------- views ---------------- */
+  const ICON = {
+    sound: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>',
+    mute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>',
+    full: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+    menu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+  };
+  const tname = i => (i == null ? '' : S.teams[i]);
+  const minutes = () => Math.round((S.roundsQ * 5.5 + S.roundsF * 4.5 + 5) / 5) * 5;
+
+  function top(where) {
+    return `<header class="top">
+      <div class="brand"><span class="brand-mark">Finance Feud</span><span class="brand-org">${esc(S.org)}</span></div>
+      ${where ? `<span class="where">${esc(where)}</span>` : ''}
+      <div class="tools">
+        ${X.chip ? X.chip() : ''}
+        <button class="tool" data-act="sound" aria-label="${S.sound ? 'Turn sound off' : 'Turn sound on'}">${S.sound ? ICON.sound : ICON.mute}<span>${S.sound ? 'Sound on' : 'Sound off'}</span></button>
+        <button class="tool" data-act="full" aria-label="Full screen">${ICON.full}<span>Full screen</span></button>
+        <button class="tool" data-act="menu" aria-expanded="${ui.menu}" aria-label="Menu">${ICON.menu}<span>Menu</span></button>
+        ${ui.menu ? `<div class="menu" role="menu">
+          ${S.screen !== 'setup' ? '<button data-act="go-stages">Standings</button>' : ''}
+          <button data-act="rules">How to play</button>
+          ${S.screen === 'match' ? '<button data-act="scores">Adjust the scores</button>' : ''}
+          ${X.menu ? X.menu() : ''}
+          <button data-act="keywarn">Answer key (host only)</button>
+          <hr>
+          <button data-act="restart">Start over</button>
+        </div>` : ''}
+      </div>
+    </header>`;
+  }
+
+  function viewSetup() {
+    const teamIn = i => `<label class="team-in" style="--tc:var(--t${i})"><i class="dot"></i>
+      <input class="input" id="team-${i}" data-team="${i}" value="${esc(S.teams[i])}" maxlength="28" aria-label="Team name"></label>`;
+    const stepper = (which, val, label) => `<div class="row row--between">
+        <div class="field-label">${label}</div>
+        <div class="stepper"><button data-act="rounds" data-which="${which}" data-d="-1" aria-label="Fewer rounds">−</button><output id="rounds-${which}">${val}</output><button data-act="rounds" data-which="${which}" data-d="1" aria-label="More rounds">+</button></div>
+      </div>`;
+    return `${top('')}
+    <main class="setup">
+      <section>
+        <p class="hero-org">${esc(S.org)} presents</p>
+        <h1 class="hero-title">Finance Feud</h1>
+        <p class="hero-line">Four teams play. Two go through. One final. Zero spreadsheets.</p>
+        <p class="hero-sub">Guess the most popular answers and bank the points. After the qualifier the bottom two teams are out, and the top two play head-to-head.</p>
+        <div class="hero-actions">
+          <button class="btn btn--go btn--big" data-act="open" data-primary>Start here</button>
+          <button class="btn btn--line btn--big" data-act="rules">How to play</button>
+        </div>
+      </section>
+      <section class="panel" aria-label="Game setup">
+        <h2>Set up the game</h2>
+        <label class="field"><span>Shown under the title</span>
+          <input class="input" id="org" value="${esc(S.org)}" maxlength="40"></label>
+        <div>
+          <div class="row row--between" style="margin-bottom:.5rem"><span class="field-label">Teams, in playing order</span>
+            <button class="btn btn--quiet" data-act="shuffle">Shuffle the order</button></div>
+          <div class="draw">
+            <div class="draw-col">${teamIn(S.order[0])}${teamIn(S.order[1])}</div>
+            <div class="draw-col">${teamIn(S.order[2])}${teamIn(S.order[3])}</div>
+          </div>
+        </div>
+        ${stepper('Q', S.roundsQ, 'Qualifier rounds, all four teams')}
+        ${stepper('F', S.roundsF, 'Final rounds, top two teams')}
+        <p class="note" id="mins">About ${minutes()} minutes in total. With ${S.roundsQ} qualifier rounds, ${S.roundsQ % 4 === 0 ? 'every team answers first the same number of times' : 'some teams answer first more often than others; 4 is the fair number'}.</p>
+        ${X.setup ? X.setup() : ''}
+      </section>
+    </main>`;
+  }
+
+  function viewStages() {
+    const sq = S.stages.q, sf = S.stages.f, champ = sf.winner;
+    const live = k => S.match && S.match.key === k && !S.match.done;
+    const qTeams = sq.done ? sq.rank : S.order;
+    const qRows = qTeams.map((ti, pos) => `<div class="mrow ${sq.done && pos > 1 ? 'is-out' : ''}" style="--tc:var(--t${ti})"><i class="dot"></i><span>${esc(tname(ti))}</span>
+      ${sq.done ? (pos < 2 ? '<em class="won">Through</em>' : '<em class="out">Out</em>') + `<b>${sq.score[ti]}</b>` : ''}</div>`).join('');
+    const fRow = k => sf.t[k] == null
+      ? `<div class="mrow is-tbd"><span>${k === 0 ? 'First' : 'Second'} place in the qualifier</span></div>`
+      : `<div class="mrow ${champ != null && champ !== sf.t[k] ? 'is-out' : ''}" style="--tc:var(--t${sf.t[k]})"><i class="dot"></i><span>${esc(tname(sf.t[k]))}</span>${champ === sf.t[k] ? '<em class="won">Champions</em>' : ''}${champ != null ? `<b>${sf.score[k]}</b>` : ''}</div>`;
+    return `${top('Standings')}
+    <main class="bracket-wrap">
+      <div class="bracket-head"><h1>${champ != null ? esc(tname(champ)) + ' are the champions' : sq.done ? 'Two teams left' : 'Road to the final'}</h1>
+        ${!S.match ? '<button class="btn btn--quiet" data-act="go-setup">Edit teams</button>' : ''}</div>
+      <div class="bracket">
+        <div class="semis"><article class="mcard ${!sq.done ? 'is-next' : ''}">
+          <div class="mcard-h"><span>Stage 1: Qualifier</span>${sq.done ? '<span>Finished</span>' : ''}</div>
+          <p class="mcard-sub">All four teams play the same ${S.roundsQ} rounds. The top two go through. The bottom two are out.</p>
+          ${qRows}
+          ${!sq.done ? (live('q') ? '<button class="btn btn--go" data-act="resume" data-primary>Back to the qualifier</button>'
+            : '<button class="btn btn--go" data-act="start" data-k="q" data-primary>Start the qualifier</button>') : ''}
+        </article></div>
+        <div class="join" aria-hidden="true"></div>
+        <div><article class="mcard mcard--final ${sq.done && champ == null ? 'is-next' : ''}">
+          <div class="mcard-h"><span>Stage 2: The Final</span>${champ != null ? '<span>Finished</span>' : ''}</div>
+          <p class="mcard-sub">Head-to-head over ${S.roundsF} rounds, with face-offs, three strikes and steals.</p>
+          ${fRow(0)}${fRow(1)}
+          ${sq.done && champ == null ? (live('f') ? '<button class="btn btn--go" data-act="resume" data-primary>Back to the final</button>'
+            : '<button class="btn btn--go" data-act="start" data-k="f" data-primary>Start the final</button>') : ''}
+        </article></div>
+      </div>
+    </main>`;
+  }
+
+  function hostBar(cue, acts) {
+    return `<footer class="host">
+      <div class="host-cue"><small>Host</small><strong>${cue}</strong></div>
+      <div class="host-act">${acts}<button class="btn btn--undo" data-act="undo" ${hist.length ? '' : 'disabled'}>Undo</button></div>
+    </footer>`;
+  }
+  const answerForm = (ph, missLabel) => `<form data-form="answer" autocomplete="off">
+      <input class="input" id="answer" name="answer" placeholder="${esc(ph)}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Answer heard">
+      <button class="btn btn--go" type="submit">Check</button></form>
+      <button class="btn btn--line" data-act="miss">${missLabel}</button>`;
+  const list = a => (a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]);
+
+  function viewMatch() {
+    const m = S.match, r = m.r, q = QMAP[r.qid], all = m.mode === 'all';
+    const names = m.t.map(tname);
+    const act = actingTeam();
+    const roundLabel = r.tiebreak ? 'Tie-breaker' : `Round ${m.round + 1} of ${m.total}`;
+    const multLabel = r.mult === 3 ? 'Triple points' : r.mult === 2 ? 'Double points' : '';
+    const boxes = (n, used) => Array.from({ length: n }, (_, i) => `<i class="${i < used ? 'on' : ''}">✕</i>`).join('');
+
+    const teamPanel = seat => {
+      let state = '', live = false, dim = false, strikes = '';
+      if (all) {
+        const playing = m.players.includes(seat);
+        if (m.done) { const pos = m.rank.indexOf(seat); state = pos < 2 ? 'Through to the final' : 'Eliminated'; live = pos < 2; dim = pos > 1; }
+        else if (!playing) { state = rankKey(m, seat) > rankKey(m, m.players[0]) ? 'Already through' : 'Eliminated'; dim = true; }
+        else {
+          if (r.phase === 'intro') state = r.turn === seat ? 'Answers first' : '';
+          else if (r.phase === 'turns' && r.turn === seat) { state = 'Answering'; live = true; }
+          else if (r.phase === 'reveal' && r.earned[seat]) state = `+${r.earned[seat]} this round`;
+          else if (r.out[seat] >= 2) { state = 'Out this round'; dim = r.phase === 'turns'; }
+          if (r.phase !== 'intro') strikes = boxes(2, r.out[seat]);
+        }
+      } else {
+        if (m.done) state = m.won === seat ? 'Winner' : '';
+        else if (r.phase === 'faceoff' && act === seat) state = 'Answering';
+        else if (r.phase === 'choose' && r.fo.winner === seat) state = 'Won the face-off';
+        else if (r.phase === 'play' && r.control === seat) state = 'Playing';
+        else if (r.phase === 'steal' && act === seat) state = 'Chance to steal';
+        else if (r.phase === 'reveal' && r.winner === seat) state = `+${r.award} this round`;
+        live = !m.done && ((act === seat && r.phase !== 'intro') || (r.phase === 'reveal' && r.winner === seat) || (r.phase === 'choose' && r.fo.winner === seat));
+        if ((r.phase === 'play' || r.phase === 'steal' || r.phase === 'reveal') && r.control === seat) strikes = boxes(3, r.strikes);
+      }
+      return `<section class="team ${live ? 'is-live' : ''} ${dim ? 'is-dim' : ''}" style="--tc:var(--t${m.t[seat]})" aria-label="${esc(names[seat])}">
+        <span class="team-flag"></span>
+        <div class="team-name">${esc(names[seat])}</div>
+        <div class="team-score">${m.score[seat]}</div>
+        <div class="team-state">${esc(state)}</div>
+        <div class="strikes" aria-label="Strikes">${strikes}</div>
+      </section>`;
+    };
+
+    let centre;
+    if (r.phase === 'intro') {
+      centre = `<div class="intro">
+        <div class="chips"><span class="chip">${NAMES[m.key]}</span><span class="chip">${esc(CATS[q.cat])}</span>${multLabel ? `<span class="chip chip--hot">${multLabel}</span>` : ''}</div>
+        ${r.tiebreak ? `<div class="intro-n">Tie!</div><div class="intro-of">One more round decides it</div>`
+          : `<div class="intro-n">${m.round + 1}</div><div class="intro-of">Round ${m.round + 1} of ${m.total}</div>`}
+        <p>${all ? `Teams take turns, one answer each. ${esc(names[r.turn])} go first.` : 'One player from each team, up to the front for the face-off.'}</p>
+      </div>`;
+    } else {
+      const rows = q.a.length <= 4 ? q.a.length : Math.ceil(q.a.length / 2);
+      const tiles = q.a.map((ans, i) => {
+        const open = r.shown[i], late = r.by[i] === 'late';
+        return `<li class="tile ${open ? 'is-open' : ''} ${late ? 'is-late' : ''} ${ui.just === i ? 'is-just' : ''}"><div class="tile-in">${open
+          ? `<span class="tile-a">${esc(ans[0])}</span><span class="tile-p">${ans[1]}</span>`
+          : `<button class="tile-hide" data-act="tile" data-i="${i}" aria-label="Reveal answer ${i + 1}"><span class="tile-num">${i + 1}</span></button>`}</div></li>`;
+      }).join('');
+      let under;
+      if (m.done) under = `<div class="banner">${all ? `${esc(names[m.rank[0]])} and ${esc(names[m.rank[1]])} go through to the final` : `${esc(names[m.won])} win ${m.score[m.won]} to ${m.score[other(m.won)]}`}</div>`;
+      else if (r.phase === 'reveal' && all) {
+        const best = Math.max.apply(null, r.earned);
+        under = `<div class="banner">${best > 0 ? `${list(m.players.filter(s => r.earned[s] === best).map(s => esc(names[s])))} bank the most this round: +${best}` : 'Nobody scored this round'}</div>`;
+      } else if (r.phase === 'reveal') under = `<div class="banner">${esc(names[r.winner])} take the round: ${r.pot}${r.mult > 1 ? ` × ${r.mult} = ${r.award}` : ''} points</div>`;
+      else under = `<div class="pot"><span>${all ? 'Found so far' : 'Round total'}</span><b>${r.pot}</b>${r.mult > 1 ? `<em>× ${r.mult}</em>` : ''}</div>`;
+      centre = `<div class="chips"><span class="chip">${roundLabel}</span><span class="chip">${esc(CATS[q.cat])}</span>${multLabel ? `<span class="chip chip--hot">${multLabel}</span>` : ''}<span class="chip">Question ${q.no}</span></div>
+        <h1 class="q-text">${esc(q.q)}</h1>
+        <ol class="board ${q.a.length <= 4 ? 'is-single' : ''}" style="--rows:${rows}">${tiles}</ol>
+        ${under}
+        ${ui.line ? `<div class="line-x">${esc(ui.line)}</div>` : ''}`;
+    }
+
+    let cue, acts;
+    const tbtn = side => `<button class="btn btn--team" style="--tc:var(--t${m.t[side]})" data-act="buzz" data-s="${side}">${esc(names[side])}</button>`;
+    if (ui.pending) {
+      cue = `Checking “${esc(ui.pending.text)}”`;
+      acts = `<span class="wait"><i></i><i></i><i></i> Checking the board</span><button class="btn btn--line" data-act="miss">Call it wrong</button>`;
+    } else if (m.done) {
+      cue = all ? `${esc(names[m.rank[0]])} and ${esc(names[m.rank[1]])} are through. ${esc(names[m.rank[2]])} and ${esc(names[m.rank[3]])} are out.` : 'That is the game.';
+      acts = `<button class="btn btn--go" data-act="go-stages" data-primary>See the standings</button>`;
+    } else if (r.phase === 'intro') {
+      cue = all
+        ? (r.tiebreak ? `Tie at the cut. ${list(m.players.map(s => esc(names[s])))} play one more round.` : `All four teams play this round. ${esc(names[r.turn])} answer first.`)
+        : 'Call one player from each team to the front.';
+      acts = `<button class="btn btn--line" data-act="picker">Change the question</button><button class="btn btn--go" data-act="show" data-primary>Show the question</button>`;
+    } else if (r.phase === 'turns') {
+      cue = `${esc(names[act])}: one player, one answer.${r.out[act] === 1 ? ' One strike already.' : ''}`;
+      acts = answerForm('Type the answer you heard', 'Strike') + '<button class="btn btn--undo" data-act="endround">End round</button>';
+    } else if (r.phase === 'faceoff' && r.fo.turn == null) {
+      cue = 'Read the question aloud. Who buzzed first?';
+      acts = `${tbtn(0)}<span class="kbd">←</span><span class="kbd">→</span>${tbtn(1)}`;
+    } else if (r.phase === 'faceoff') {
+      cue = r.fo.hit ? `${esc(names[act])}: beat “${esc(q.a[r.fo.hit.idx][0])}” to take control.`
+        : r.fo.fresh ? `Neither answer is up there. Next two players: ${esc(names[act])} first.`
+        : `${esc(names[act])} to answer.`;
+      acts = answerForm('Type the answer you heard', 'No answer');
+    } else if (r.phase === 'choose') {
+      cue = `${esc(names[r.fo.winner])} win the face-off. Play or pass?`;
+      acts = `<button class="btn btn--line" data-act="pass">Pass</button><button class="btn btn--go" data-act="play" data-primary>Play</button>`;
+    } else if (r.phase === 'play') {
+      cue = `${esc(names[r.control])} are playing. One answer each, down the line.`;
+      acts = answerForm('Type the answer you heard', 'Strike');
+    } else if (r.phase === 'steal') {
+      cue = `Three strikes. ${esc(names[act])} huddle for one answer to steal ${r.pot * r.mult} points.`;
+      acts = answerForm('Type the steal answer', 'No steal');
+    } else {
+      const left = r.shown.filter(v => !v).length;
+      const last = m.round >= m.total - 1;
+      const tie = all ? cutTied(m) : m.score[0] === m.score[1];
+      const nextLabel = !last ? 'Next round' : tie ? 'Play the tie-breaker' : all ? 'See who goes through' : 'Finish the final';
+      cue = left ? `${left} answer${left > 1 ? 's' : ''} still hidden. Show the room what they missed.` : 'Board is clear. On you go.';
+      acts = left
+        ? `<button class="btn btn--line" data-act="next">${nextLabel}</button><button class="btn btn--go" data-act="reveal" data-primary>Reveal the next answer</button>`
+        : `<button class="btn btn--go" data-act="next" data-primary>${nextLabel}</button>`;
+    }
+    const sides = all ? [[0, 1], [2, 3]] : [[0], [1]];
+    return `${top(NAMES[m.key])}
+      <main class="stage ${all ? 'stage--four' : ''}"><div class="side">${sides[0].map(teamPanel).join('')}</div><div class="centre">${centre}</div><div class="side">${sides[1].map(teamPanel).join('')}</div></main>
+      ${hostBar(cue, acts)}`;
+  }
+
+  function viewChampion() {
+    const f = S.stages.f, w = f.winner, k = f.t.indexOf(w);
+    return `${top('The Final')}
+      <main class="champ">
+        <span class="champ-k">Finance Feud champions</span>
+        <h1 class="champ-name">${esc(tname(w))}</h1>
+        <p class="champ-score">${f.score[k]} to ${f.score[other(k)]} over ${esc(tname(f.t[other(k)]))}</p>
+        <div class="row" style="justify-content:center">
+          <button class="btn btn--go" data-act="party" data-primary>More confetti</button>
+          <button class="btn btn--line" data-act="go-stages">See the standings</button>
+        </div>
+      </main>`;
+  }
+
+  function viewKey() {
+    const card = q => `<article class="key-q"><h3><small>${q.no}</small>${esc(q.q)}</h3><ol>${q.a.map(a => `<li><span>${esc(a[0])}</span><b>${a[1]}</b></li>`).join('')}</ol></article>`;
+    const group = (title, ids) => `<h2>${title}</h2><div class="key-grid">${ids.map(id => card(QMAP[id])).join('')}</div>`;
+    return `<main class="key">
+      <div class="row row--between"><h1>Host answer key</h1><a class="btn btn--line key-back" href="#play">Back to the game</a></div>
+      <p class="key-warn">Every answer is on this page. Keep it off the big screen: open it on your phone or print it.</p>
+      <p>The number beside each question matches the “Question” tag shown on the game screen. Click any hidden tile on the board to reveal it by hand.</p>
+      ${group('Qualifier', SCHEDULE.q)}${group('The Final', SCHEDULE.f)}${group('Spare questions', SPARES)}
+    </main>`;
+  }
+
+  function viewModal() {
+    if (!ui.modal) return '';
+    let body = '';
+    if (ui.modal === 'rules') {
+      body = `<h2>How to play</h2><ol class="rules">
+        <li><div><b>The qualifier.</b> All four teams play the same board. Teams take turns, and each turn one player gives one answer.</div></li>
+        <li><div><b>Bank it.</b> If the answer is on the board, your team banks its points straight away. If not, that is a strike. Two strikes and your team sits out the rest of that round.</div></li>
+        <li><div><b>The cut.</b> After the last qualifying round, which is worth double, the top two teams go through to the final. The bottom two are out.</div></li>
+        <li><div><b>The final: face-off.</b> One player from each team comes up. First to buzz answers. The higher answer wins control, and that team chooses to play or pass.</div></li>
+        <li><div><b>The final: strikes and steals.</b> The playing team answers down the line. Three strikes and the other team huddles for one answer to steal the round total.</div></li>
+        <li><div><b>Champions.</b> Final rounds are worth single, double, then triple points. Most points wins.</div></li>
+      </ol><div class="modal-foot"><button class="btn btn--go" data-act="close" data-primary>Got it</button></div>`;
+    } else if (ui.modal === 'picker') {
+      const cur = S.match.r.qid;
+      body = `<h2>Choose a question</h2>` + Object.keys(CATS).map(c => {
+        const qs = QUESTIONS.filter(q => q.cat === c && (!S.used.includes(q.id) || q.id === cur));
+        return qs.length ? `<div class="pick-cat">${esc(CATS[c])}</div><div class="pick-list">${qs.map(q =>
+          `<button class="pick ${q.id === cur ? 'is-current' : ''}" data-act="pick" data-q="${q.id}"><small>Question ${QMAP[q.id].no}</small>${esc(q.q)}</button>`).join('')}</div>` : '';
+      }).join('') + `<div class="modal-foot"><button class="btn btn--line" data-act="close">Keep the current one</button></div>`;
+    } else if (ui.modal === 'scores') {
+      const m = S.match;
+      body = `<h2>Adjust the scores</h2><form data-form="scores" class="score-edit">
+        ${m.t.map((ti, s) => `<label for="score-${s}"><b>${esc(tname(ti))}</b></label><input class="input" id="score-${s}" name="s${s}" type="number" inputmode="numeric" min="0" step="1" value="${m.score[s]}" style="width:8rem">`).join('')}
+        <div class="modal-foot" style="grid-column:1/-1"><button type="button" class="btn btn--line" data-act="close">Cancel</button><button class="btn btn--go" type="submit">Save scores</button></div>
+      </form>`;
+    } else if (ui.modal === 'restart') {
+      body = `<h2>Start over?</h2><p>This clears every score and sends you back to setup. Team names are kept.</p>
+        <div class="modal-foot"><button class="btn btn--line" data-act="close">Keep playing</button><button class="btn btn--go" data-act="restart-yes">Start over</button></div>`;
+    } else if (ui.modal === 'keywarn') {
+      body = `<h2>Open the answer key?</h2><p>It shows every answer. Make sure this screen is not the one the room can see.</p>
+        <div class="modal-foot"><button class="btn btn--line" data-act="close">Cancel</button><a class="btn btn--go" href="#answer-key" data-act="close-soft">Show the answers</a></div>`;
+    }
+    return `<div class="modal-bg" data-act="close-bg"><div class="modal ${ui.modal === 'picker' ? 'modal--wide' : ''}" role="dialog" aria-modal="true">${body}</div></div>`;
+  }
+
+  function render() {
+    const app = document.getElementById('app');
+    if (!app) return;
+    const isKey = location.hash === '#answer-key';
+    let html;
+    if (isKey) html = viewKey();
+    else if (S.screen === 'setup') html = viewSetup();
+    else if (S.screen === 'stages') html = viewStages();
+    else if (S.screen === 'champion') html = viewChampion();
+    else html = viewMatch();
+    app.innerHTML = html + (isKey ? '' : viewModal());
+    ui.just = null;
+    if (isKey) return;
+    const target = ui.modal ? app.querySelector('.modal [data-primary], .modal input') : (app.querySelector('#answer') || (S.screen !== 'setup' ? app.querySelector('[data-primary]') : null));
+    if (target) { try { target.focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
+  }
+
+  /* ---------------- events ---------------- */
+  function resetGame() {
+    const keep = { teams: S.teams, org: S.org, order: S.order, roundsQ: S.roundsQ, roundsF: S.roundsF, sound: S.sound };
+    S = Object.assign(fresh(), keep);
+    hist.length = 0; ui.line = ''; cancelPending();
+    save();
+  }
+  function onClick(e) {
+    const el = e.target.closest('[data-act]');
+    if (ui.menu && (!el || el.dataset.act !== 'menu')) { ui.menu = false; if (!el) { render(); return; } }
+    if (!el) return;
+    const a = el.dataset.act;
+    if (a === 'close-bg') { if (e.target === el) { ui.modal = null; render(); } return; }
+    if (a === 'close-soft') { ui.modal = null; return; }
+    audio();
+    switch (a) {
+      case 'menu': ui.menu = !ui.menu; render(); break;
+      case 'sound': S.sound = !S.sound; save(); render(); if (S.sound) sfx.pop(); break;
+      case 'full': try { (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => toast('Full screen is not available here. Try F11.')); } catch (err) { toast('Full screen is not available here. Try F11.'); } break;
+      case 'rules': case 'scores': case 'restart': case 'keywarn': case 'picker': ui.modal = a; render(); break;
+      case 'close': ui.modal = null; render(); break;
+      case 'restart-yes': ui.modal = null; resetGame(); render(); break;
+      case 'open': case 'go-stages': S.screen = 'stages'; save(); render(); break;
+      case 'go-setup': S.screen = 'setup'; save(); render(); break;
+      case 'resume': S.screen = 'match'; save(); render(); break;
+      case 'shuffle': {
+        const o = S.order.slice();
+        for (let i = 3; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [o[i], o[j]] = [o[j], o[i]]; }
+        S.order = o; save(); render(); break;
+      }
+      case 'rounds': {
+        const k = el.dataset.which === 'Q' ? 'roundsQ' : 'roundsF';
+        S[k] = Math.max(2, Math.min(6, S[k] + Number(el.dataset.d))); save(); render(); break;
+      }
+      case 'start': startMatch(el.dataset.k); break;
+      case 'show': showQuestion(); break;
+      case 'pick': ui.modal = null; setQuestion(el.dataset.q); break;
+      case 'buzz': buzz(Number(el.dataset.s)); break;
+      case 'tile': cancelPending(); hit(Number(el.dataset.i)); break;
+      case 'miss': cancelPending(); miss(); break;
+      case 'endround': cancelPending(); commit(() => { S.match.r.phase = 'reveal'; }); break;
+      case 'play': choose(true); break;
+      case 'pass': choose(false); break;
+      case 'reveal': revealNext(); break;
+      case 'next': nextRound(); break;
+      case 'undo': undo(); break;
+      case 'party': sfx.fanfare(); confetti(); break;
+      default: if (X.click) X.click(a, el);
+    }
+  }
+  function onSubmit(e) {
+    const f = e.target.closest('[data-form]');
+    if (!f) return;
+    e.preventDefault();
+    audio();
+    if (f.dataset.form === 'answer') {
+      const inp = f.querySelector('input'), v = inp.value;
+      inp.value = '';
+      submit(v);
+    } else if (f.dataset.form === 'scores') {
+      const v = S.match.t.map((_, s) => Math.max(0, Math.round(Number(f.elements['s' + s].value) || 0)));
+      ui.modal = null;
+      commit(() => { S.match.score = v; });
+    }
+  }
+  function onInput(e) {
+    const t = e.target;
+    if (t.dataset && t.dataset.team != null) { S.teams[Number(t.dataset.team)] = t.value.trim() || `Team ${Number(t.dataset.team) + 1}`; save(); }
+    else if (t.id === 'org') { S.org = t.value.trim(); save(); const o = document.querySelector('.hero-org'); if (o) o.textContent = S.org + ' presents'; const b = document.querySelector('.brand-org'); if (b) b.textContent = S.org; }
+  }
+  function onKey(e) {
+    if (e.key === 'Escape') { if (ui.modal || ui.menu) { ui.modal = null; ui.menu = false; render(); } return; }
+    if (ui.modal || S.screen !== 'match' || location.hash === '#answer-key') return;
+    const r = S.match.r;
+    if (r.phase === 'faceoff' && r.fo.turn == null && !S.match.done) {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); buzz(0); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); buzz(1); }
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !(e.target && e.target.value)) { e.preventDefault(); undo(); }
+  }
+
+  function boot() {
+    const app = document.getElementById('app');
+    ui.resumed = load();
+    app.addEventListener('click', onClick);
+    app.addEventListener('submit', onSubmit);
+    app.addEventListener('input', onInput);
+    document.addEventListener('keydown', onKey);
+    window.addEventListener('hashchange', render);
+    render();
+    if (ui.resumed && S.screen !== 'setup') toast('Welcome back. Your game was saved.');
+    if (X.boot) X.boot();
+  }
+
+  return { boot, render, toast, setLine, esc, X, state: () => S, _test: { matchLocal, QMAP } };
+})();
+
+Feud.boot();
+</script>
+</body>
+</html>
