@@ -393,6 +393,7 @@ const Feud = (() => {
     sound: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>',
     mute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>',
     full: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+    reset: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>',
     menu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
   };
   const tname = i => (i == null ? '' : S.teams[i]);
@@ -405,6 +406,7 @@ const Feud = (() => {
       <div class="tools">
         ${X.chip ? X.chip() : ''}
         <button class="tool" data-act="sound" aria-label="${S.sound ? 'Turn sound off' : 'Turn sound on'}">${S.sound ? ICON.sound : ICON.mute}<span>${S.sound ? 'Sound on' : 'Sound off'}</span></button>
+        <button class="tool" data-act="restart" aria-label="Reset the game">${ICON.reset}<span>Reset</span></button>
         <button class="tool" data-act="full" aria-label="Full screen">${ICON.full}<span>Full screen</span></button>
         <button class="tool" data-act="menu" aria-expanded="${ui.menu}" aria-label="Menu">${ICON.menu}<span>Menu</span></button>
         ${ui.menu ? `<div class="menu" role="menu">
@@ -413,8 +415,6 @@ const Feud = (() => {
           ${S.screen === 'match' ? '<button data-act="scores">Adjust the scores</button>' : ''}
           ${X.menu ? X.menu() : ''}
           <button data-act="keywarn">Answer key (host only)</button>
-          <hr>
-          <button data-act="restart">Start over</button>
         </div>` : ''}
       </div>
     </header>`;
@@ -674,8 +674,11 @@ const Feud = (() => {
         <div class="modal-foot" style="grid-column:1/-1"><button type="button" class="btn btn--line" data-act="close">Cancel</button><button class="btn btn--go" type="submit">Save scores</button></div>
       </form>`;
     } else if (ui.modal === 'restart') {
-      body = `<h2>Start over?</h2><p>This clears every score and sends you back to setup. Team names are kept.</p>
-        <div class="modal-foot"><button class="btn btn--line" data-act="close">Keep playing</button><button class="btn btn--go" data-act="restart-yes">Start over</button></div>`;
+      body = `<h2>Reset the game?</h2>
+        <p><b>Clear the scores</b> starts the game again from the qualifier. Team names and round settings stay.</p>
+        <p><b>Reset everything</b> also puts the team names, title and round settings back to the defaults.</p>
+        <p class="note">You cannot undo either.</p>
+        <div class="modal-foot"><button class="btn btn--line" data-act="close" data-primary>Cancel</button><button class="btn btn--line" data-act="reset-all">Reset everything</button><button class="btn btn--go" data-act="restart-yes">Clear the scores</button></div>`;
     } else if (ui.modal === 'keywarn') {
       body = `<h2>Open the answer key?</h2><p>It shows every answer. Make sure this screen is not the one the room can see.</p>
         <div class="modal-foot"><button class="btn btn--line" data-act="close">Cancel</button><a class="btn btn--go" href="#answer-key" data-act="close-soft">Show the answers</a></div>`;
@@ -721,7 +724,8 @@ const Feud = (() => {
       case 'full': try { (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => toast('Full screen is not available here. Try F11.')); } catch (err) { toast('Full screen is not available here. Try F11.'); } break;
       case 'rules': case 'scores': case 'restart': case 'keywarn': case 'picker': ui.modal = a; render(); break;
       case 'close': ui.modal = null; render(); break;
-      case 'restart-yes': ui.modal = null; resetGame(); render(); break;
+      case 'restart-yes': ui.modal = null; resetGame(); render(); toast('Scores cleared. Ready for a new game.'); break;
+      case 'reset-all': ui.modal = null; S = Object.assign(fresh(), { sound: S.sound }); hist.length = 0; ui.line = ''; cancelPending(); save(); render(); toast('Everything is back to the defaults.'); break;
       case 'open': case 'go-stages': S.screen = 'stages'; save(); render(); break;
       case 'go-setup': S.screen = 'setup'; save(); render(); break;
       case 'resume': S.screen = 'match'; save(); render(); break;
